@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found — Daniel Gómez Verde">
+  <div class="container not-found">
+    <p class="label">404</p>
+    <h1>Page not found</h1>
+    <p><a href="/">Back to the home page</a></p>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-16);
+    justify-items: start;
+  }
+</style>

@@ -1,0 +1,87 @@
+---
+import { isExternal } from '../lib/assets';
+
+interface Strength {
+  id: string;
+  title: string;
+  metric: string;
+  text: string;
+  href: string;
+  linkLabel: string;
+}
+
+interface Props {
+  items: readonly Strength[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="strengths">
+  {
+    items.map((item) => (
+      <li class="strength">
+        <p class="strength__title label">{item.title}</p>
+        <p class="strength__metric mono">{item.metric}</p>
+        <p class="strength__text">{item.text}</p>
+        <a
+          class="strength__link"
+          href={item.href}
+          rel={isExternal(item.href) ? 'noopener' : undefined}
+        >
+          {item.linkLabel}
+          <span class="visually-hidden"> — {item.title}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .strengths {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .strength {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .strength__metric {
+    font-size: var(--step-3);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--color-accent);
+    letter-spacing: -0.02em;
+  }
+
+  .strength__text {
+    font-size: var(--step--1);
+    color: var(--color-text-muted);
+    flex: 1;
+  }
+
+  .strength__link {
+    font-size: var(--step--1);
+    font-weight: 500;
+  }
+
+  @media (min-width: 540px) {
+    .strengths {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .strengths {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

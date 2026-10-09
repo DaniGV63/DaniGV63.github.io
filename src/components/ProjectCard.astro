@@ -1,0 +1,122 @@
+---
+import TagList from './TagList.astro';
+import { isExternal } from '../lib/assets';
+
+interface Props {
+  title: string;
+  summary: string;
+  href: string;
+  tags: readonly string[];
+  status?: string;
+  featured?: boolean;
+}
+
+const { title, summary, href, tags, status, featured = false } = Astro.props;
+const external = isExternal(href);
+---
+
+<article class:list={['card', { 'card--featured': featured }]}>
+  <div class="card__head">
+    <h3 class="card__title">
+      <a
+        class="card__link"
+        href={href}
+        rel={external ? 'noopener' : undefined}
+      >
+        {title}
+        {
+          external && (
+            <svg
+              aria-hidden="true"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M7 17 17 7M8 7h9v9" />
+            </svg>
+          )
+        }
+      </a>
+    </h3>
+    {status && <span class="card__status label">{status}</span>}
+  </div>
+  <p class="card__summary">{summary}</p>
+  <TagList tags={tags} />
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .card:hover {
+    border-color: var(--color-text-muted);
+  }
+
+  .card--featured {
+    padding: var(--space-6);
+    background: var(--color-surface);
+  }
+
+  .card__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  .card__title {
+    font-size: var(--step-1);
+  }
+
+  .card--featured .card__title {
+    font-size: var(--step-2);
+  }
+
+  /* Whole card is clickable through the title link. */
+  .card__link {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .card__link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  .card__link svg {
+    margin-left: var(--space-1);
+    vertical-align: -0.1em;
+  }
+
+  .card__status {
+    padding: 0.125rem var(--space-2);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-sm);
+    color: var(--color-accent);
+  }
+
+  .card__summary {
+    color: var(--color-text-muted);
+    flex: 1;
+  }
+</style>

@@ -3,15 +3,15 @@
 Marcar con [x] al terminar. Cada fase acaba con `npm run build` sin errores y un push que despliega.
 
 ## Fase 0 — Puesta en marcha
-- [ ] Crear en GitHub el repo público **`DaniGV63.github.io`** y hacer el primer push de este esqueleto.
-- [ ] GitHub → Settings → Pages → Source: **GitHub Actions**.
-- [ ] Comprobar que `https://danigv63.github.io` muestra la página provisional.
+- [x] Crear en GitHub el repo público **`DaniGV63.github.io`** y hacer el primer push de este esqueleto.
+- [x] GitHub → Settings → Pages → Source: **GitHub Actions**.
+- [x] Comprobar que `https://danigv63.github.io` muestra la página provisional.
 
 ## Fase 1 — Home y diseño base
-- [ ] Decidir dirección visual (ver "Decisiones abiertas").
-- [ ] `BaseLayout`: cabecera, navegación, pie con enlaces, modo claro/oscuro, metadatos SEO y Open Graph.
-- [ ] Home: titular + 3 tarjetas de proyecto + experiencia resumida + enlaces (CV PDF, GitHub, LinkedIn, email).
-- [ ] CV en PDF en `public/cv/` (versión **sin teléfono ni dirección**).
+- [x] Decidir dirección visual: **C — Engineering grid** (Inter + JetBrains Mono, acento teal).
+- [x] `BaseLayout`: cabecera, navegación, pie con enlaces, modo claro/oscuro, metadatos SEO y Open Graph.
+- [x] Home: titular + 3 tarjetas de proyecto + experiencia resumida + enlaces (CV PDF, GitHub, LinkedIn, email).
+- [ ] CV en PDF en `public/cv/` (versión **sin teléfono ni dirección**). **Provisional:** el PDF actual contiene teléfono, dirección y edad; sustituir por la versión pública antes de commitearlo.
 
 ## Fase 2 — Proyecto estrella: F1
 - [ ] Confirmar la spec con la visualización de referencia (`docs/F1_SPEC.md` §6).

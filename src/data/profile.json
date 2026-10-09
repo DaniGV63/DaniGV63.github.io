@@ -1,7 +1,11 @@
 {
   "name": "Daniel Gómez Verde",
   "role": "Data & AI Engineer",
-  "headline": "TODO(dani): one-line headline for the home page",
+  "headline": "I build data pipelines and machine-learning systems, and explain what they show.",
+  "photo": {
+    "src": "/images/daniel.jpg",
+    "alt": "Portrait of Daniel Gómez Verde"
+  },
   "status": "MSc Data Science student at Aarhus University, looking for a part-time student job in data/AI.",
   "location": "Aarhus, Denmark",
   "links": {
@@ -10,6 +14,40 @@
     "github": "https://github.com/DaniGV63",
     "cv": "/cv/Daniel-Gomez-Verde-CV.pdf"
   },
+  "strengths": [
+    {
+      "id": "data-engineering",
+      "title": "Data engineering",
+      "metric": "−35%",
+      "text": "Cut ETL processing time by 35% and automated a daily report for every plant in the Canary and Balearic Islands (Endesa).",
+      "href": "#experience",
+      "linkLabel": "See the experience"
+    },
+    {
+      "id": "programming",
+      "title": "Programming",
+      "metric": "Full-stack",
+      "text": "Built BotLLM, a WhatsApp appointment bot with its own website, end to end.",
+      "href": "https://github.com/DaniGV63/BotLLM",
+      "linkLabel": "BotLLM on GitHub"
+    },
+    {
+      "id": "modelling",
+      "title": "Modelling & statistics",
+      "metric": "90%",
+      "text": "Predictive models in scikit-learn (Endesa). CNN classifier at 90% accuracy vs. an 85% benchmark (MDPI paper).",
+      "href": "https://www.mdpi.com/2673-4591/82/1/38",
+      "linkLabel": "Read the paper"
+    },
+    {
+      "id": "communication",
+      "title": "Communication",
+      "metric": "CEO",
+      "text": "Reported directly to the CEO at Mática Partners. Private tutor in STEM subjects, 2021–2023.",
+      "href": "#experience",
+      "linkLabel": "See the experience"
+    }
+  ],
   "experience": [
     {
       "id": "matica",
@@ -18,6 +56,7 @@
       "period": "Jan 2026 – Jul 2026",
       "location": "Madrid, Spain",
       "context": "Spanish data & AI consultancy (~150 employees). Reported directly to the CEO, who assigned me independent client projects.",
+      "featuredHighlights": [0, 3, 4],
       "highlights": [
         "Optimised the clustering of the vector store behind the firm's internal AI assistant, improving retrieval performance by 4.7% with hierarchical and agentic chunking.",
         "Completed intensive training in LangGraph and LangChain to build multi-agent LLM systems.",
@@ -33,6 +72,7 @@
       "period": "Sept 2024 – Sept 2025",
       "location": "Madrid, Spain (hybrid)",
       "context": "Operations team at one of Spain's largest electric utilities, covering data-analysis capacity the department did not have in-house.",
+      "featuredHighlights": [0, 1, 2],
       "highlights": [
         "Automated a daily performance report with charts for every power plant in the Canary and Balearic Islands (PI System, Pandas, SQL).",
         "Reduced ETL processing times by 35%.",
@@ -45,7 +85,8 @@
     {
       "id": "f1-race-analysis",
       "title": "F1 Race Analysis",
-      "summary": "TODO(dani): one-line result once the analysis is done.",
+      "summary": "Python pipeline (FastF1) and an interactive D3 analysis of one race.",
+      "status": "In progress",
       "href": "/projects/f1-race-analysis/",
       "tags": [
         "Python",

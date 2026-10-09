@@ -1,0 +1,58 @@
+---
+import profile from '../data/profile.json';
+import ContactLinks from './ContactLinks.astro';
+
+const repoUrl = `${profile.links.github}/DaniGV63.github.io`;
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" id="contact">
+  <div class="container site-footer__inner">
+    <div>
+      <h2 class="site-footer__title">Contact</h2>
+      <p class="site-footer__lead">
+        Looking for a part-time student job in data/AI in Aarhus.
+      </p>
+    </div>
+    <ContactLinks />
+    <p class="site-footer__legal"><slot name="legal" /></p>
+    <p class="site-footer__credit">
+      © {year} {profile.name} · Built with{' '}
+      <a href="https://astro.build" rel="noopener">Astro</a> ·{' '}
+      <a href={repoUrl} rel="noopener">Source on GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-24);
+    padding-block: var(--space-12);
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .site-footer__inner {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .site-footer__title {
+    font-size: var(--step-2);
+  }
+
+  .site-footer__lead {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .site-footer__legal:empty {
+    display: none;
+  }
+
+  .site-footer__legal,
+  .site-footer__credit {
+    font-size: var(--step--1);
+    color: var(--color-text-muted);
+  }
+</style>

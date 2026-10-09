@@ -4,12 +4,23 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="F1 Race Analysis — Daniel Gómez Verde">
-  <h1>F1 Race Analysis</h1>
-  <p>Work in progress.</p>
-  <p><small>
-    Data via the open-source FastF1 library. This project is unofficial and not
-    associated with Formula 1. F1, FORMULA ONE and related marks are trademarks
-    of Formula One Licensing B.V.
-  </small></p>
-  <p><a href="/">← Back</a></p>
+  <div class="container intro">
+    <h1>F1 Race Analysis</h1>
+    <p>Work in progress.</p>
+    <p><a href="/">← Back to the home page</a></p>
+  </div>
+  <Fragment slot="legal">
+    Data via the open-source FastF1 library. This is an unofficial,
+    non-commercial project and is not associated with Formula 1. F1 and related
+    marks are trademarks of Formula One Licensing B.V.
+  </Fragment>
 </BaseLayout>
+
+<style>
+  .intro {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-12);
+    justify-items: start;
+  }
+</style>

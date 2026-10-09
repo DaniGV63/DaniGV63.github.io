@@ -1,31 +1,159 @@
 ---
-// Placeholder home. Claude Code builds the real design in Phase 1 (docs/PLAN.md).
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Section from '../components/Section.astro';
+import StrengthGrid from '../components/StrengthGrid.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ExperienceItem from '../components/ExperienceItem.astro';
+import TagList from '../components/TagList.astro';
 import profile from '../data/profile.json';
+
+const featuredProject = profile.projects.find((p) => p.featured && p.id === 'f1-race-analysis');
+const otherProjects = profile.projects.filter((p) => p.id !== featuredProject?.id);
 ---
 
 <BaseLayout>
-  <h1>{profile.name}</h1>
-  <p>{profile.role} · {profile.location}</p>
-  <p>{profile.status}</p>
+  <Hero />
 
-  <h2>Projects</h2>
-  <ul>
-    {profile.projects.map((p) => (
-      <li><a href={p.href}>{p.title}</a></li>
-    ))}
-  </ul>
+  <Section id="what-i-do" title="What I do">
+    <StrengthGrid items={profile.strengths} />
+  </Section>
 
-  <h2>Experience</h2>
-  <ul>
-    {profile.experience.map((e) => (
-      <li>{e.role} — {e.company} ({e.period})</li>
-    ))}
-  </ul>
+  <Section id="work" title="Selected work">
+    <div class="work">
+      {
+        featuredProject && (
+          <ProjectCard
+            title={featuredProject.title}
+            summary={featuredProject.summary}
+            href={featuredProject.href}
+            tags={featuredProject.tags}
+            status={featuredProject.status}
+            featured
+          />
+        )
+      }
+      <div class="work__row">
+        {
+          otherProjects.map((project) => (
+            <ProjectCard
+              title={project.title}
+              summary={project.summary}
+              href={project.href}
+              tags={project.tags}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </Section>
 
-  <p>
-    <a href={`mailto:${profile.links.email}`}>Email</a> ·
-    <a href={profile.links.linkedin}>LinkedIn</a> ·
-    <a href={profile.links.github}>GitHub</a>
-  </p>
+  <Section id="experience" title="Experience">
+    <div class="stack">
+      {
+        profile.experience.map((job) => (
+          <ExperienceItem
+            role={job.role}
+            company={job.company}
+            period={job.period}
+            location={job.location}
+            context={job.context}
+            highlights={job.featuredHighlights.map((index) => job.highlights[index])}
+          />
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section id="toolbox" title="Toolbox">
+    <div class="toolbox">
+      {
+        Object.entries(profile.skills).map(([group, tags]) => (
+          <div>
+            <h3 class="toolbox__group">{group}</h3>
+            <TagList tags={tags} />
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section id="education" title="Education & languages">
+    <div class="education">
+      <div>
+        <h3 class="toolbox__group">Education</h3>
+        <ul class="stack stack--tight">
+          {
+            profile.education.map((item) => (
+              <li>
+                <p class="education__degree">{item.degree}</p>
+                <p class="education__meta mono">{item.school} · {item.period}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div>
+        <h3 class="toolbox__group">Languages</h3>
+        <ul class="stack stack--tight">
+          {profile.languages.map((language) => <li>{language}</li>)}
+        </ul>
+      </div>
+    </div>
+  </Section>
 </BaseLayout>
+
+<style>
+  .work,
+  .stack {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .stack--tight {
+    gap: var(--space-4);
+  }
+
+  .work__row {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .toolbox {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .toolbox__group {
+    margin-bottom: var(--space-2);
+    font-size: var(--step-0);
+  }
+
+  .education {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .education__degree {
+    font-weight: 600;
+  }
+
+  .education__meta {
+    font-size: var(--step--1);
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 720px) {
+    .work__row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .toolbox {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .education {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,69 @@
+---
+interface Props {
+  role: string;
+  company: string;
+  period: string;
+  location: string;
+  context: string;
+  highlights: readonly string[];
+}
+
+const { role, company, period, location, context, highlights } = Astro.props;
+---
+
+<article class="experience">
+  <header class="experience__head">
+    <h3 class="experience__title">
+      {role} <span class="experience__company">· {company}</span>
+    </h3>
+    <p class="experience__meta mono">{period} · {location}</p>
+  </header>
+  <p class="experience__context">{context}</p>
+  <ul class="experience__list">
+    {highlights.map((item) => <li>{item}</li>)}
+  </ul>
+</article>
+
+<style>
+  .experience {
+    display: grid;
+    gap: var(--space-3);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .experience:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .experience__title {
+    font-size: var(--step-1);
+  }
+
+  .experience__company {
+    color: var(--color-accent);
+  }
+
+  .experience__meta {
+    margin-top: var(--space-1);
+    font-size: var(--step--1);
+    color: var(--color-text-muted);
+  }
+
+  .experience__context {
+    color: var(--color-text-muted);
+  }
+
+  .experience__list {
+    display: grid;
+    gap: var(--space-2);
+    padding-left: var(--space-4);
+    list-style: disc;
+    max-width: var(--measure);
+  }
+
+  .experience__list li::marker {
+    color: var(--color-text-muted);
+  }
+</style>

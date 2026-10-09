@@ -1,0 +1,104 @@
+---
+import profile from '../data/profile.json';
+import ContactLinks from './ContactLinks.astro';
+import { publicFileExists } from '../lib/assets';
+
+const hasPhoto = publicFileExists(profile.photo.src);
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero__inner">
+    <div class="hero__portrait">
+      {
+        hasPhoto ? (
+          <img
+            src={profile.photo.src}
+            alt={profile.photo.alt}
+            width="96"
+            height="144"
+            decoding="async"
+          />
+        ) : (
+          <div class="hero__placeholder" aria-hidden="true">DG</div>
+        )
+      }
+    </div>
+    <div class="hero__text">
+      <p class="label">{profile.role} · {profile.location}</p>
+      <h1 id="hero-title" class="hero__name">{profile.name}</h1>
+      <p class="hero__headline">{profile.headline}</p>
+      <p class="hero__status">{profile.status}</p>
+      <ContactLinks primaryCv />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--space-12) var(--space-8);
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .hero__portrait img,
+  .hero__placeholder {
+    width: 96px;
+    height: 144px;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    object-fit: cover;
+  }
+
+  .hero__placeholder {
+    display: grid;
+    place-items: center;
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--step-2);
+    font-weight: 700;
+  }
+
+  .hero__text {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+
+  .hero__name {
+    font-size: var(--step-4);
+    letter-spacing: -0.03em;
+  }
+
+  .hero__headline {
+    font-size: var(--step-1);
+    line-height: 1.35;
+    max-width: 36ch;
+  }
+
+  .hero__status {
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 720px) {
+    .hero__inner {
+      grid-template-columns: 1fr auto;
+      gap: var(--space-12);
+    }
+
+    .hero__portrait {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .hero__portrait img,
+    .hero__placeholder {
+      width: 160px;
+      height: 240px;
+    }
+  }
+</style>
