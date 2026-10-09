@@ -1,0 +1,31 @@
+---
+// Placeholder home. Claude Code builds the real design in Phase 1 (docs/PLAN.md).
+import BaseLayout from '../layouts/BaseLayout.astro';
+import profile from '../data/profile.json';
+---
+
+<BaseLayout>
+  <h1>{profile.name}</h1>
+  <p>{profile.role} · {profile.location}</p>
+  <p>{profile.status}</p>
+
+  <h2>Projects</h2>
+  <ul>
+    {profile.projects.map((p) => (
+      <li><a href={p.href}>{p.title}</a></li>
+    ))}
+  </ul>
+
+  <h2>Experience</h2>
+  <ul>
+    {profile.experience.map((e) => (
+      <li>{e.role} — {e.company} ({e.period})</li>
+    ))}
+  </ul>
+
+  <p>
+    <a href={`mailto:${profile.links.email}`}>Email</a> ·
+    <a href={profile.links.linkedin}>LinkedIn</a> ·
+    <a href={profile.links.github}>GitHub</a>
+  </p>
+</BaseLayout>

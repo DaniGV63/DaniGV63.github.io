@@ -1,0 +1,54 @@
+/* Design tokens. Final visual direction is an open decision (docs/PLAN.md). */
+:root {
+  --bg: #ffffff;
+  --surface: #f5f6f8;
+  --text: #16181d;
+  --muted: #5b6270;
+  --accent: #1f3a5f;
+  --border: #e3e6eb;
+  --radius: 10px;
+  --max-width: 1080px;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #171a21;
+    --text: #e8eaee;
+    --muted: #9aa1ad;
+    --accent: #8fb3e3;
+    --border: #262a33;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 16px;
+}

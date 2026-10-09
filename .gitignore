@@ -1,0 +1,29 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment
+.env
+.env.*
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+pipeline/.fastf1-cache/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code local settings
+.claude/settings.local.json

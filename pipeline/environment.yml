@@ -1,0 +1,9 @@
+name: portfolio-f1
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      # Relative to the working directory: run `conda env create` from pipeline/.
+      - -r requirements.txt

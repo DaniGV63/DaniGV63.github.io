@@ -1,0 +1,133 @@
+{
+  "name": "Daniel Gómez Verde",
+  "role": "Data & AI Engineer",
+  "headline": "TODO(dani): one-line headline for the home page",
+  "status": "MSc Data Science student at Aarhus University, looking for a part-time student job in data/AI.",
+  "location": "Aarhus, Denmark",
+  "links": {
+    "email": "daniel.gomezverde@gmail.com",
+    "linkedin": "https://www.linkedin.com/in/daniel-g%C3%B3mez-verde/",
+    "github": "https://github.com/DaniGV63",
+    "cv": "/cv/Daniel-Gomez-Verde-CV.pdf"
+  },
+  "experience": [
+    {
+      "id": "matica",
+      "role": "AI Consultant",
+      "company": "Mática Partners",
+      "period": "Jan 2026 – Jul 2026",
+      "location": "Madrid, Spain",
+      "context": "Spanish data & AI consultancy (~150 employees). Reported directly to the CEO, who assigned me independent client projects.",
+      "highlights": [
+        "Optimised the clustering of the vector store behind the firm's internal AI assistant, improving retrieval performance by 4.7% with hierarchical and agentic chunking.",
+        "Completed intensive training in LangGraph and LangChain to build multi-agent LLM systems.",
+        "Prototyped a Playwright-based autonomous agent to detect front-end bugs across web deployments.",
+        "Led a Databricks proof-of-concept for PepsiCo evaluating its analytics and KPI tooling.",
+        "Delivered a proof-of-concept for UN Tourism: automated document generation from an Oracle database, resolving all 23 errors found during analysis."
+      ]
+    },
+    {
+      "id": "endesa",
+      "role": "Operation & Maintenance Improvement (Trainee Analyst)",
+      "company": "Endesa",
+      "period": "Sept 2024 – Sept 2025",
+      "location": "Madrid, Spain (hybrid)",
+      "context": "Operations team at one of Spain's largest electric utilities, covering data-analysis capacity the department did not have in-house.",
+      "highlights": [
+        "Automated a daily performance report with charts for every power plant in the Canary and Balearic Islands (PI System, Pandas, SQL).",
+        "Reduced ETL processing times by 35%.",
+        "Built predictive models with Python and scikit-learn.",
+        "Collected, cleaned and normalised data on the Spanish electricity system."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "f1-race-analysis",
+      "title": "F1 Race Analysis",
+      "summary": "TODO(dani): one-line result once the analysis is done.",
+      "href": "/projects/f1-race-analysis/",
+      "tags": [
+        "Python",
+        "FastF1",
+        "pandas",
+        "D3.js",
+        "Data pipeline"
+      ],
+      "featured": true
+    },
+    {
+      "id": "botllm",
+      "title": "BotLLM — AI appointment bot",
+      "summary": "WhatsApp appointment-management bot with its own website for a physiotherapy clinic, built end to end.",
+      "href": "https://github.com/DaniGV63/BotLLM",
+      "tags": [
+        "LLM",
+        "WhatsApp",
+        "Full-stack"
+      ],
+      "featured": true
+    },
+    {
+      "id": "mdpi-emg",
+      "title": "Gesture recognition with EMG and deep learning",
+      "summary": "Peer-reviewed paper (MDPI Engineering Proceedings, 2024): STFT/CQT features and CNNs reaching 90% accuracy vs. an 85% benchmark.",
+      "href": "https://www.mdpi.com/2673-4591/82/1/38",
+      "tags": [
+        "Deep learning",
+        "Signal processing",
+        "Research"
+      ],
+      "featured": true
+    }
+  ],
+  "education": [
+    {
+      "degree": "MSc in Data Science, specialisation in Finance & FinTech",
+      "school": "Aarhus University",
+      "period": "2026 – 2028 (in progress)"
+    },
+    {
+      "degree": "Bachelor's in Data Engineering and Systems",
+      "school": "Universidad Politécnica de Madrid (ETSIT)",
+      "period": "2020 – 2024"
+    },
+    {
+      "degree": "Erasmus+ exchange, computer science",
+      "school": "Mälardalen University, Västerås, Sweden",
+      "period": "2023 – 2024"
+    }
+  ],
+  "skills": {
+    "Data engineering": [
+      "Python",
+      "SQL",
+      "Pandas",
+      "ETL",
+      "PostgreSQL",
+      "Spark",
+      "PI System"
+    ],
+    "ML & AI": [
+      "scikit-learn",
+      "TensorFlow",
+      "LangGraph",
+      "LangChain",
+      "FAISS",
+      "RAG evaluation (Precision@K, MRR)"
+    ],
+    "Engineering": [
+      "FastAPI",
+      "Docker",
+      "Git",
+      "Nginx",
+      "Redis",
+      "Playwright"
+    ]
+  },
+  "languages": [
+    "Spanish (native)",
+    "English (C1, TOEFL iBT 100)",
+    "Danish (starting lessons)"
+  ]
+}
