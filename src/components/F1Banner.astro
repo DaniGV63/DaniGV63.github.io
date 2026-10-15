@@ -1,6 +1,6 @@
 ---
 // Decorative banner for the F1 project card: the real circuit outline from the
-// pipeline data, a chequered edge and a comet that runs the lap on hover.
+// pipeline data and a comet that runs the lap on hover.
 import track from '../data/f1/2021-abu-dhabi-grand-prix-r/track.json';
 import { orient, boundsOf, type Point } from '../scripts/f1/circuit';
 
@@ -25,7 +25,6 @@ const d =
     <path class="banner__line" d={d} pathLength="100" />
     <path class="banner__comet" d={d} pathLength="100" />
   </svg>
-  <span class="banner__check"></span>
 </div>
 
 <style>
@@ -84,15 +83,6 @@ const d =
     stroke-linejoin: round;
     stroke-dasharray: 0 100;
     filter: drop-shadow(0 0 4px rgb(225 6 0 / 0.9));
-  }
-
-  .banner__check {
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 6px;
-    background:
-      conic-gradient(#f5f5f5 25%, #111 0 50%, #f5f5f5 0 75%, #111 0) 0 0 / 12px 12px;
-    opacity: 0.85;
   }
 
   :global(.card--banner:hover) .banner__stripes {

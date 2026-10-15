@@ -15,6 +15,8 @@ interface Props {
 
 const { title, summary, href, tags, status, featured = false, banner = false } = Astro.props;
 const external = isExternal(href);
+// Banner cards show the F1 symbol in place of a leading "F1".
+const symbolTitle = banner && title.startsWith('F1 ') ? title.slice(3) : null;
 ---
 
 <article class:list={['card', { 'card--featured': featured, 'card--banner': banner }]}>
@@ -25,8 +27,18 @@ const external = isExternal(href);
         class="card__link"
         href={href}
         rel={external ? 'noopener' : undefined}
+        aria-label={symbolTitle ? title : undefined}
       >
-        {title}
+        {
+          symbolTitle ? (
+            <span class="card__brand">
+              <img src="/f1/f1.svg" alt="" width="62" height="16" />
+              <span class="card__brand-text">{symbolTitle}</span>
+            </span>
+          ) : (
+            title
+          )
+        }
         {
           external && (
             <svg
@@ -143,6 +155,25 @@ const external = isExternal(href);
 
   .card--banner .card__link {
     color: #fff;
+  }
+
+  .card__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .card__brand img {
+    display: block;
+    height: 1.15em;
+    width: auto;
+  }
+
+  .card__brand-text {
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
 
   .card--banner .card__summary {
