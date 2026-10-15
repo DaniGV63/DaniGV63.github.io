@@ -27,13 +27,16 @@ const hasCv = publicFileExists(links.cv);
     )
   }
   <li>
-    <a class="contact-links__link" href={links.github} rel="noopener">GitHub</a>
-  </li>
-  <li>
     <a class="contact-links__link" href={links.linkedin} rel="noopener">LinkedIn</a>
   </li>
   <li>
-    <a class="contact-links__link" href={`mailto:${links.email}`}>{links.email}</a>
+    <a
+      class="contact-links__link"
+      href={`mailto:${links.email}`}
+      aria-label="Mail Daniel Gómez Verde"
+    >
+      Mail
+    </a>
   </li>
 </ul>
 

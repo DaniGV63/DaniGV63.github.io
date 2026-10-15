@@ -1,7 +1,7 @@
 {
   "name": "Daniel Gómez Verde",
   "role": "Data & AI Engineer",
-  "headline": "I build data pipelines and machine-learning systems, and explain what they show.",
+  "headline": "I'd love to play board games all day. Instead, I turn the data you hand over when you click “Accept cookies” into information people can act on.",
   "photo": {
     "src": "/images/daniel.jpg",
     "alt": "Portrait of Daniel Gómez Verde"
@@ -169,6 +169,6 @@
   "languages": [
     "Spanish (native)",
     "English (C1, TOEFL iBT 100)",
-    "Danish (starting lessons)"
+    "French (basic)"
   ]
 }

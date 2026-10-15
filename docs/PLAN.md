@@ -11,7 +11,7 @@ Marcar con [x] al terminar. Cada fase acaba con `npm run build` sin errores y un
 - [x] Decidir dirección visual: **C — Engineering grid** (Inter + JetBrains Mono, acento teal).
 - [x] `BaseLayout`: cabecera, navegación, pie con enlaces, modo claro/oscuro, metadatos SEO y Open Graph.
 - [x] Home: titular + 3 tarjetas de proyecto + experiencia resumida + enlaces (CV PDF, GitHub, LinkedIn, email).
-- [ ] CV en PDF en `public/cv/` (versión **sin teléfono ni dirección**). **Provisional:** el PDF actual contiene teléfono, dirección y edad; sustituir por la versión pública antes de commitearlo.
+- [x] CV en PDF en `public/cv/` (versión pública sin teléfono, dirección ni edad).
 
 ## Fase 2 — Proyecto estrella: F1
 - [ ] Confirmar la spec con la visualización de referencia (`docs/F1_SPEC.md` §6).

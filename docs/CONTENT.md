@@ -7,7 +7,7 @@ Fuente: CV de septiembre de 2026. Si algo no está aquí, se pregunta a Dani.
 - Daniel Gómez Verde — Data & AI Engineer.
 - MSc in Data Science, specialisation in Finance & FinTech, Aarhus University (2026–2028, in progress, 120 ECTS).
 - Busca un trabajo de estudiante part-time en data/IA en Aarhus.
-- Idiomas: español nativo; inglés C1 (TOEFL iBT 100, dic. 2025); danés: empezará clases.
+- Idiomas: español nativo; inglés C1 (TOEFL iBT 100, dic. 2025); francés: nivel básico.
 
 ## Experiencia
 ### AI Consultant — Mática Partners (Jan 2026 – Jul 2026, Madrid)
