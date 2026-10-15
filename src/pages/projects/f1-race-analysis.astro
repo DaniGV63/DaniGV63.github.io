@@ -8,8 +8,40 @@ import meta from '../../data/f1/2021-abu-dhabi-grand-prix-r/meta.json';
 import laps from '../../data/f1/2021-abu-dhabi-grand-prix-r/laps.json';
 import track from '../../data/f1/2021-abu-dhabi-grand-prix-r/track.json';
 import { formatLapTime } from '../../scripts/f1/types';
+import type { LapRow, RaceMeta, SegFile, TrackData } from '../../scripts/f1/types';
+import { analyseRace } from '../../lib/raceAnalysis';
 
 const folder = '2021-abu-dhabi-grand-prix-r';
+
+// Every number in the written analysis is computed here from the pipeline JSON.
+const segFiles = import.meta.glob('../../data/f1/2021-abu-dhabi-grand-prix-r/seg/*.json', {
+  eager: true,
+  import: 'default',
+}) as Record<string, SegFile>;
+const analysis = analyseRace(
+  meta as RaceMeta,
+  laps as LapRow[],
+  Object.fromEntries(Object.values(segFiles).map((file) => [file.driver, file])),
+  track as TrackData,
+);
+const percent = (value: number): string => `${(value * 100).toFixed(0)}%`;
+const [first, second, third] = analysis.rates;
+const raceWinner = analysis.rates.find((rate) => rate.finish === 1);
+const widest = analysis.parts.slice(0, 3);
+const pitLaps = laps.filter((row) => row.pitIn || row.pitOut).length;
+const cleanTop = analysis.cleanRates.slice(0, 4);
+
+const resultLine = `${first?.name} won ${percent(first!.rate)} of the parts they contested, ${second?.name} ${percent(second!.rate)} and ${third?.name} ${percent(third!.rate)}. With about ${analysis.fieldSize.toFixed(0)} cars per lap, an evenly matched field would win about ${percent(analysis.chance)} each.`;
+const winnerLine =
+  raceWinner && first && raceWinner.code !== first.code
+    ? ` ${first.name} won more parts than ${raceWinner.name}, who won the race.`
+    : '';
+const widestLine = `The gap between the median driver and the best one is widest near ${widest
+  .map((part) => `${part.corner} (${part.seconds.toFixed(2)} s)`)
+  .join(', ')
+  .replace(/, ([^,]*)$/, ' and $1')}. The five widest parts hold ${percent(analysis.topShare)} of the ${analysis.totalSpread.toFixed(1)} s per lap that separates the median driver from a lap stitched together from the best part times.`;
+const cleanLine = `All laps count, including ${pitLaps} pit-stop laps and the safety-car laps. Without them the top four is ${analysis.sameOrder ? 'the same' : 'different'}: ${cleanTop.map((rate) => `${rate.code} ${percent(rate.rate)}`).join(', ')}.`;
+
 const winner = meta.drivers.find((d) => d.finish === 1);
 
 const timed = laps.filter((row) => row.isAccurate && row.lapTime !== null);
@@ -53,11 +85,11 @@ const classification = meta.drivers
   description="Interactive analysis of the 2021 Abu Dhabi Grand Prix: sector times per lap linked to the driver's path on track."
 >
   <div class="container intro">
-    <p class="label">Project · work in progress</p>
+    <p class="label">Project</p>
     <h1>F1 Race Analysis</h1>
     <p class="intro__lead">
       Lap-by-lap sector times for the {meta.year} {meta.event}, linked to the path
-      each driver took on track. First iteration: the chart layout will change.
+      each driver took on track.
     </p>
   </div>
 
@@ -104,6 +136,50 @@ const classification = meta.drivers
     </div>
   </section>
 
+  <section class="container reading" aria-labelledby="reading-title">
+    <h2 id="reading-title" class="label">Reading the race</h2>
+    <div class="reading__grid">
+      <div>
+        <h3>Question</h3>
+        <p>
+          Which driver was fastest in each part of the circuit, by how much, and where were the
+          differences decided?
+        </p>
+      </div>
+      <div>
+        <h3>Approach</h3>
+        <p>
+          Each lap is cut into 25 equal-distance parts. In every part of every lap, the fastest of
+          all drivers running on that lap wins the part. Win rate is parts won divided by parts
+          contested. All {meta.totalLaps} laps and {analysis.cells.toLocaleString('en')} lap-part
+          comparisons are used.
+        </p>
+      </div>
+      <div class="reading__wide">
+        <h3>Result</h3>
+        <p>{resultLine}{winnerLine}</p>
+        <p>{widestLine}</p>
+      </div>
+      <div>
+        <h3>Limitations</h3>
+        <ul>
+          <li>{cleanLine}</li>
+          <li>Part times come from integrating car speed; differences below about 0.05 s are noise.</li>
+          <li>Fuel load, tyre age and traffic are not controlled for.</li>
+          <li>Retired drivers contest fewer parts, so rates are compared per part contested.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>What I'd do next</h3>
+        <ul>
+          <li>Control for tyre age and fuel with a regression per stint.</li>
+          <li>Add qualifying laps as a pace reference for each driver.</li>
+          <li>Run the same pipeline on other races and compare circuits.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <section class="container method" aria-labelledby="method-title">
     <h2 id="method-title" class="label">Data</h2>
     <p>
@@ -145,6 +221,43 @@ const classification = meta.drivers
     font-style: italic;
     text-transform: uppercase;
     letter-spacing: 0.02em;
+  }
+
+  .reading {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-12);
+  }
+
+  .reading__grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .reading h3 {
+    margin-bottom: var(--space-2);
+    font-size: var(--step-0);
+  }
+
+  .reading ul {
+    display: grid;
+    gap: var(--space-2);
+    padding-left: var(--space-4);
+    list-style: disc;
+  }
+
+  .reading p + p {
+    margin-top: var(--space-3);
+  }
+
+  @media (min-width: 720px) {
+    .reading__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .reading__wide {
+      grid-column: 1 / -1;
+    }
   }
 
   .facts,
