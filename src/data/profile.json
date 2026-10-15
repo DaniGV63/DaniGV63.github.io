@@ -85,7 +85,7 @@
     {
       "id": "f1-race-analysis",
       "title": "F1 Race Analysis",
-      "summary": "All 19 drivers of the 2021 Abu Dhabi GP compared lap by lap and part by part: Hamilton won the most parts of the circuit (19%), Verstappen won the race.",
+      "summary": "The 14 finishers of the 2021 Abu Dhabi GP compared part by part of every lap: Hamilton won the most parts of the circuit (22%), Verstappen won the race.",
       "href": "/projects/f1-race-analysis/",
       "tags": [
         "Python",

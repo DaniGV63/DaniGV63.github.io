@@ -22,7 +22,7 @@ export interface RaceAnalysis {
   chance: number; // win rate if every driver were equally fast
   rates: DriverRate[];
   cleanRates: DriverRate[];
-  sameOrder: boolean; // top four unchanged without pit and safety-car laps
+  sameOrder: boolean; // top three unchanged without pit and safety-car laps
   parts: PartSpread[];
   topShare: number; // share of the total spread held by the five widest parts
   totalSpread: number;
@@ -52,7 +52,16 @@ export function analyseRace(
   track: TrackData,
 ): RaceAnalysis {
   const rows = new Map(laps.map((r) => [`${r.driver}-${r.lap}`, r]));
-  const codes = Object.keys(segments).sort();
+  // Only classified finishers are compared: retirements stop contributing
+  // laps part-way through and would skew the per-part win rates.
+  const finished = new Set(
+    meta.drivers
+      .filter((d) => d.status === 'Finished' || /^\+\d+ Laps?$/.test(d.status))
+      .map((d) => d.code),
+  );
+  const codes = Object.keys(segments)
+    .filter((code) => finished.has(code))
+    .sort();
   const parts = segments[codes[0]!]!.segments;
 
   const run = (clean: boolean) => {
@@ -123,7 +132,7 @@ export function analyseRace(
   const totalSpread = partSpreads.reduce((sum, p) => sum + p.seconds, 0);
   const topShare = partSpreads.slice(0, 5).reduce((sum, p) => sum + p.seconds, 0) / totalSpread;
 
-  const top = (list: DriverRate[]): string => list.slice(0, 4).map((r) => r.code).join();
+  const top = (list: DriverRate[]): string => list.slice(0, 3).map((r) => r.code).join();
   return {
     cells: all.cells,
     fieldSize: all.fieldSize,

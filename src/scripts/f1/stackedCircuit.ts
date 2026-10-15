@@ -248,7 +248,7 @@ export function createStacked(
     ctx.fillStyle = muted;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = `600 ${Math.max(10, stroke * 3.4 * baseScale)}px ui-monospace, Consolas, monospace`;
+    ctx.font = `600 ${Math.max(10, stroke * 3.4 * baseScale)}px 'Saira Variable', system-ui, sans-serif`;
     sectors.labels.forEach((label) => {
       const [px, py] = project(label.at[0], label.at[1], topZ);
       ctx.fillText(label.text, px, py);
@@ -259,7 +259,7 @@ export function createStacked(
     if (m > 0.6 && selected !== null) {
       ctx.globalAlpha = (m - 0.6) / 0.4;
       ctx.fillStyle = ink;
-      ctx.font = '700 12px ui-monospace, Consolas, monospace';
+      ctx.font = "700 12px 'Saira Variable', system-ui, sans-serif";
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
       const left = outline.reduce((p, q) => (q[0] < p[0] ? q : p));

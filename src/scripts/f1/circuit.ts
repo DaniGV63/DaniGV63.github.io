@@ -67,7 +67,7 @@ export interface CircuitView {
 }
 
 /** Oriented circuit plus the viewBox used by the 2D map and the 3D canvas. */
-export function circuitView(track: TrackData, pad = 260): CircuitView {
+export function circuitView(track: TrackData, pad = 1500): CircuitView {
   const outline = orient(track.outline as Point[], track.rotationDeg);
   const corners = orient(
     track.corners.map((c) => [c.x, c.y] as Point),
@@ -177,27 +177,56 @@ export function sectorMarks(view: CircuitView, track: TrackData): SectorMarks {
   });
 
   const edges = [0, ...fractions, 1];
-  const labels = ['S1', 'S2', 'S3'].map((text, i) => {
-    const mid = (edges[i]! + edges[i + 1]!) / 2;
-    const [x, y] = view.sample(mid);
-    const h = headingAt(view.sample, mid);
-    let nx = -Math.sin(h);
-    let ny = Math.cos(h);
-    // put the label on the side facing away from the middle of the circuit
-    if ((x - cx) * nx + (y - cy) * ny < 0) {
-      nx = -nx;
-      ny = -ny;
+  const trackPoints = Array.from({ length: 400 }, (_, n) => view.sample(n / 400));
+  const clearance = ([px, py]: Point): number =>
+    Math.min(...trackPoints.map(([x, y]) => Math.hypot(x - px, y - py)));
+  const distance = view.stroke * 3.2;
+  const margin = view.stroke * 1.8;
+  const roomNeeded = view.stroke * 2.6;
+  const turning = (from: number, to: number): number => {
+    let total = 0;
+    let previous = headingAt(view.sample, from);
+    for (let n = 1; n <= 6; n++) {
+      const h = headingAt(view.sample, from + ((to - from) * n) / 6);
+      let delta = Math.abs(h - previous);
+      if (delta > Math.PI) delta = 2 * Math.PI - delta;
+      total += delta;
+      previous = h;
     }
-    const d = view.stroke * 5.2;
-    let at: Point = [x + nx * d, y + ny * d];
-    const margin = view.stroke * 3;
-    const outside =
-      at[0] < view.minX + margin ||
-      at[0] > view.minX + view.width - margin ||
-      at[1] < view.minY + margin ||
-      at[1] > view.minY + view.height - margin;
-    if (outside) at = [x - nx * d, y - ny * d]; // not enough room: use the inner side
-    return { text, at };
+    return total;
+  };
+
+  // Each label goes over the straightest stretch of its own sector, on the
+  // side that faces away from the circuit and has room for the text.
+  const labels = ['S1', 'S2', 'S3'].map((text, i) => {
+    const from = edges[i]!;
+    const to = edges[i + 1]!;
+    const span = Math.min(0.07, (to - from) * 0.5);
+    const windows: { f: number; turn: number }[] = [];
+    for (let start = from; start + span <= to + 1e-9; start += 0.008) {
+      windows.push({ f: start + span / 2, turn: turning(start, start + span) });
+    }
+    windows.sort((a, b) => a.turn - b.turn);
+    for (const { f } of windows) {
+      const [x, y] = view.sample(f);
+      const h = headingAt(view.sample, f);
+      const options = [1, -1]
+        .map((side): Point => [x - Math.sin(h) * distance * side, y + Math.cos(h) * distance * side])
+        .sort((p, q) => {
+          const away = (r: Point): number => (r[0] - cx) ** 2 + (r[1] - cy) ** 2;
+          return away(q) - away(p);
+        });
+      for (const at of options) {
+        const inside =
+          at[0] > view.minX + margin &&
+          at[0] < view.minX + view.width - margin &&
+          at[1] > view.minY + margin &&
+          at[1] < view.minY + view.height - margin;
+        if (inside && clearance(at) >= roomNeeded) return { text, at };
+      }
+    }
+    const [x, y] = view.sample((from + to) / 2);
+    return { text, at: [x, y] as Point };
   });
   return { ticks, labels };
 }

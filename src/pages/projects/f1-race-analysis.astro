@@ -29,7 +29,9 @@ const [first, second, third] = analysis.rates;
 const raceWinner = analysis.rates.find((rate) => rate.finish === 1);
 const widest = analysis.parts.slice(0, 3);
 const pitLaps = laps.filter((row) => row.pitIn || row.pitOut).length;
-const cleanTop = analysis.cleanRates.slice(0, 4);
+const compared = analysis.rates.length;
+const retired = meta.drivers.length - compared;
+const cleanTop = analysis.cleanRates.slice(0, 3);
 
 const resultLine = `${first?.name} won ${percent(first!.rate)} of the parts they contested, ${second?.name} ${percent(second!.rate)} and ${third?.name} ${percent(third!.rate)}. With about ${analysis.fieldSize.toFixed(0)} cars per lap, an evenly matched field would win about ${percent(analysis.chance)} each.`;
 const winnerLine =
@@ -40,7 +42,8 @@ const widestLine = `The gap between the median driver and the best one is widest
   .map((part) => `${part.corner} (${part.seconds.toFixed(2)} s)`)
   .join(', ')
   .replace(/, ([^,]*)$/, ' and $1')}. The five widest parts hold ${percent(analysis.topShare)} of the ${analysis.totalSpread.toFixed(1)} s per lap that separates the median driver from a lap stitched together from the best part times.`;
-const cleanLine = `All laps count, including ${pitLaps} pit-stop laps and the safety-car laps. Without them the top four is ${analysis.sameOrder ? 'the same' : 'different'}: ${cleanTop.map((rate) => `${rate.code} ${percent(rate.rate)}`).join(', ')}.`;
+const approachLine = `The ${compared} drivers who finished the race are compared. Each lap is cut into 25 equal-distance parts, and in every part of every lap the fastest of them wins the part. Win rate is parts won divided by parts contested. All ${meta.totalLaps} laps and ${analysis.cells.toLocaleString('en')} lap-part comparisons are used.`;
+const cleanLine = `All laps count, including the pit-stop laps and the safety-car laps. Without them the top three is ${analysis.sameOrder ? 'the same' : 'different'}: ${cleanTop.map((rate) => `${rate.code} ${percent(rate.rate)}`).join(', ')}.`;
 
 const winner = meta.drivers.find((d) => d.finish === 1);
 
@@ -86,7 +89,10 @@ const classification = meta.drivers
 >
   <div class="container intro">
     <p class="label">Project</p>
-    <h1>F1 Race Analysis</h1>
+    <h1 class="title">
+      <img src="/f1/f1.svg" alt="F1" width="84" height="21" />
+      <span>Race Analysis</span>
+    </h1>
     <p class="intro__lead">
       Lap-by-lap sector times for the {meta.year} {meta.event}, linked to the path
       each driver took on track.
@@ -148,12 +154,7 @@ const classification = meta.drivers
       </div>
       <div>
         <h3>Approach</h3>
-        <p>
-          Each lap is cut into 25 equal-distance parts. In every part of every lap, the fastest of
-          all drivers running on that lap wins the part. Win rate is parts won divided by parts
-          contested. All {meta.totalLaps} laps and {analysis.cells.toLocaleString('en')} lap-part
-          comparisons are used.
-        </p>
+        <p>{approachLine}</p>
       </div>
       <div class="reading__wide">
         <h3>Result</h3>
@@ -166,7 +167,7 @@ const classification = meta.drivers
           <li>{cleanLine}</li>
           <li>Part times come from integrating car speed; differences below about 0.05 s are noise.</li>
           <li>Fuel load, tyre age and traffic are not controlled for.</li>
-          <li>Retired drivers contest fewer parts, so rates are compared per part contested.</li>
+          <li>The {retired} drivers who retired are left out, so the comparison is among classified finishers.</li>
         </ul>
       </div>
       <div>
@@ -198,7 +199,30 @@ const classification = meta.drivers
   </Fragment>
 </BaseLayout>
 
+<style is:global>
+  html:root {
+    --font-sans: 'Saira Variable', 'Inter Variable', system-ui, sans-serif;
+    --font-mono: 'Saira Variable', 'Inter Variable', system-ui, sans-serif;
+  }
+</style>
+
 <style>
+  .title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--step-4);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .title img {
+    display: block;
+    height: 0.75em;
+    width: auto;
+  }
+
   .intro {
     display: grid;
     gap: var(--space-3);
