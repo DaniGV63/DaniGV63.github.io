@@ -31,5 +31,6 @@ Thumbs.db
 # Local CV with personal data (the public one lives in public/cv/)
 /CV - *.pdf
 
-# Provisional CV with personal data: remove this line once public/cv/ holds the sanitised version
-/public/cv/
+
+# Personal originals (CV with private data, raw photo)
+/cv_dani/
