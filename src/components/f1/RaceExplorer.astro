@@ -1,0 +1,374 @@
+---
+// Interactive explorer: sector times per lap (left) linked to the circuit map
+// (right). Logic lives in src/scripts/f1/. D3 is bundled only into this page.
+import type { LapRow, RaceMeta, TrackData } from '../../scripts/f1/types';
+
+interface Props {
+  folder: string;
+  meta: RaceMeta;
+  laps: LapRow[];
+  track: TrackData;
+}
+
+const { folder, meta, laps, track } = Astro.props;
+const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u003c');
+---
+
+<section class="f1" id="f1-explorer" aria-label="Interactive race explorer">
+  <script type="application/json" id="f1-data" set:html={payload} is:inline />
+
+  <div class="f1__bar">
+    <div>
+      <img class="f1__logo" src="/f1/f1.svg" alt="Formula 1" width="72" height="18" />
+      <p class="f1__kicker">{meta.year} · {meta.event} · {meta.session === 'Race' ? 'Race' : meta.session}</p>
+      <p class="f1__hint">Click a line to pick a lap. ← → change lap.</p>
+    </div>
+    <label class="f1__field">
+      <span>Y axis</span>
+      <select id="f1-ymode">
+        <option value="delta">Time lost vs best</option>
+        <option value="raw">Sector time</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="f1__chips" id="f1-chips" role="group" aria-label="Drivers"></div>
+
+  <div class="f1__lapbar">
+    <button type="button" id="f1-prev" aria-label="Previous lap">‹</button>
+    <input id="f1-lap" type="range" min="1" max="58" value="1" aria-label="Lap number" />
+    <button type="button" id="f1-next" aria-label="Next lap">›</button>
+    <output id="f1-lap-out" class="mono" for="f1-lap">Lap 1</output>
+  </div>
+
+  <div class="f1__views">
+    <div class="f1__view">
+      <h3 class="f1__title">Sector times by lap</h3>
+      <div class="f1__chart" id="f1-laps-chart"></div>
+      <div class="f1__tooltip" id="f1-tooltip" hidden></div>
+    </div>
+    <div class="f1__view">
+      <h3 class="f1__title">Track · <span id="f1-map-title">—</span></h3>
+      <div class="f1__map" id="f1-track-map"></div>
+      <ul class="f1__legend" aria-label="Sector colours">
+        <li><span style="background:#e10600"></span>S1</li>
+        <li><span style="background:#f5c518"></span>S2</li>
+        <li><span style="background:#3b82f6"></span>S3</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="f1__tablewrap">
+    <table class="f1__table">
+      <caption>Selected lap, selected drivers (best sector highlighted)</caption>
+      <thead>
+        <tr>
+          <th scope="col">Driver</th>
+          <th scope="col">S1</th>
+          <th scope="col">S2</th>
+          <th scope="col">S3</th>
+          <th scope="col">Lap</th>
+          <th scope="col">Tyre</th>
+        </tr>
+      </thead>
+      <tbody id="f1-table-body"></tbody>
+    </table>
+  </div>
+</section>
+
+<style is:global>
+  .f1 {
+    /* Same light/dark switch as the rest of the site (color-scheme). */
+    --f1-bg: light-dark(#f5f6f5, #0b0b0f);
+    --f1-panel: light-dark(#ffffff, #15151c);
+    --f1-line: light-dark(#dfe3e1, #2a2a35);
+    --f1-text: light-dark(#14171a, #f5f5f7);
+    --f1-muted: light-dark(#566067, #a1a1aa);
+    --f1-red: #e10600;
+    --f1-ink: light-dark(#14171a, #ffffff);
+    padding: var(--space-4);
+    background: var(--f1-bg);
+    color: var(--f1-text);
+    border-radius: var(--radius);
+    border-top: 4px solid var(--f1-red);
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .f1__bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-3);
+    align-items: end;
+  }
+
+  .f1__kicker {
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .f1__hint {
+    color: var(--f1-muted);
+    font-size: var(--step--1);
+  }
+
+  .f1__field {
+    display: grid;
+    gap: 2px;
+    font-size: 0.75rem;
+    color: var(--f1-muted);
+  }
+
+  .f1 select,
+  .f1 button {
+    font: inherit;
+    color: var(--f1-text);
+    background: var(--f1-panel);
+    border: 1px solid var(--f1-line);
+    border-radius: var(--radius-sm);
+    padding: var(--space-1) var(--space-2);
+    cursor: pointer;
+  }
+
+  .f1__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .f1-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    opacity: 0.55;
+  }
+
+  .f1-chip[aria-pressed='true'] {
+    opacity: 1;
+    border-color: var(--f1-text);
+  }
+
+  .f1__logo {
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  .f1-chip__logo {
+    border-radius: 4px;
+    background: #fff;
+    object-fit: contain;
+  }
+
+  .f1-chip__swatch {
+    width: 4px;
+    height: 1.1em;
+    border-radius: 2px;
+  }
+
+  .f1__lapbar {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .f1__lapbar input[type='range'] {
+    width: 100%;
+    accent-color: var(--f1-red);
+  }
+
+  .f1__views {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .f1__view {
+    position: relative;
+    min-width: 0;
+    padding: var(--space-3);
+    background: var(--f1-panel);
+    border: 1px solid var(--f1-line);
+    border-radius: var(--radius);
+  }
+
+  .f1__title {
+    font-size: var(--step--1);
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: var(--space-2);
+  }
+
+  .f1__chart svg,
+  .f1__map svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .f1__map {
+    max-width: 520px;
+    margin-inline: auto;
+  }
+
+  .f1__tooltip {
+    position: absolute;
+    z-index: 2;
+    padding: var(--space-2) var(--space-3);
+    background: var(--f1-panel);
+    border: 1px solid var(--f1-line);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    white-space: pre;
+    pointer-events: none;
+  }
+
+  .f1__legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--f1-muted);
+  }
+
+  .f1__legend span {
+    display: inline-block;
+    width: 12px;
+    height: 4px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .f1-axis text,
+  .f1-axis-label {
+    fill: var(--f1-muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .f1-axis path,
+  .f1-axis line {
+    stroke: var(--f1-line);
+  }
+
+  .f1-lap__line {
+    fill: none;
+    stroke-width: 1.2;
+    opacity: 0.4;
+  }
+
+  .f1-lap:hover .f1-lap__line {
+    opacity: 1;
+    stroke-width: 2.4;
+  }
+
+  .f1-lap__hit {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 12;
+    cursor: pointer;
+  }
+
+  .f1-lap__halo {
+    fill: none;
+    stroke: var(--f1-ink);
+    stroke-width: 6;
+    opacity: 0.9;
+  }
+
+  .f1-lap--active .f1-lap__line {
+    stroke-width: 3;
+    opacity: 1;
+  }
+
+  .f1-track {
+    fill: none;
+    stroke: light-dark(#d3d8d6, #2c2c38);
+    stroke-linejoin: round;
+  }
+
+  .f1-trace {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .f1-corner,
+  .f1-map-note {
+    fill: var(--f1-muted);
+    font-family: var(--font-mono);
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+
+  .f1-boundary {
+    fill: var(--f1-ink);
+  }
+
+  .f1-start {
+    fill: none;
+    stroke: var(--f1-red);
+    stroke-width: 6;
+  }
+
+  .f1__tablewrap {
+    overflow-x: auto;
+  }
+
+  .f1__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .f1__table caption {
+    padding-bottom: var(--space-2);
+    text-align: left;
+    color: var(--f1-muted);
+  }
+
+  .f1__table th,
+  .f1__table td {
+    padding: var(--space-1) var(--space-2);
+    border-bottom: 1px solid var(--f1-line);
+    text-align: right;
+  }
+
+  .f1__table th:first-child,
+  .f1__table td:first-child {
+    text-align: left;
+  }
+
+  .f1__table .is-primary td:first-child {
+    color: var(--f1-red);
+    font-weight: 700;
+  }
+
+  .f1__table .is-best {
+    color: light-dark(#7e22ce, #c084fc);
+    font-weight: 700;
+  }
+
+  @media (min-width: 900px) {
+    .f1 {
+      padding: var(--space-6);
+    }
+
+    .f1__views {
+      grid-template-columns: 1.1fr 1fr;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/f1/explorer';
+</script>

@@ -1,6 +1,6 @@
 # F1 Race Analysis — especificación
 
-> Estado: **borrador**. La forma exacta del gráfico izquierdo está pendiente de confirmar con la visualización de referencia que Dani va a compartir (ver "Pendiente de confirmar"). No implementes el gráfico izquierdo hasta que esté confirmado.
+> Estado: **primera iteración implementada** con la carrera final del GP de Abu Dabi 2021 (`src/data/f1/2021-abu-dhabi-grand-prix-r/`). La forma de la Vista A es provisional y se afinará por iteraciones con Dani (ver "Pendiente de confirmar").
 
 ## 1. Objetivo del proyecto
 
@@ -57,20 +57,23 @@ pos/<DRIVER>.json    # trayectoria por vuelta de un piloto (se carga bajo demand
 ```json
 [{ "driver": "VER", "lap": 1, "s1": 31.234, "s2": 40.112, "s3": 22.901,
    "lapTime": 94.247, "compound": "MEDIUM", "tyreLife": 1, "pitIn": false, "pitOut": false,
-   "isAccurate": true }]
+   "isAccurate": true, "position": 1, "trackStatus": "1" }]
 ```
 - Tiempos en **segundos** (float, 3 decimales). `null` si falta el dato.
 - Mantener `isAccurate` de FastF1 para poder filtrar vueltas no representativas (safety car, boxes).
 
 ### track.json
 ```json
-{ "outline": [[x, y], ...], "sectorBoundaries": [[x, y], [x, y]], "rotationDeg": 0 }
+{ "outline": [[x, y], ...], "sectorBoundaries": [[x, y], [x, y]], "rotationDeg": 0,
+  "corners": [{ "number": "1", "x": 0, "y": 0 }] }
 ```
 
 ### pos/<DRIVER>.json
 ```json
-{ "driver": "VER", "laps": { "1": [[x, y, sector], ...], "2": [...] } }
+{ "driver": "VER", "laps": { "1": { "p": [x0, y0, x1, y1, ...], "s": [i2, i3] } } }
 ```
+- `p` es una lista plana de pares x,y; `s` son los índices de punto (no de valor) donde empiezan S2 y S3.
+- Los límites de sector se calculan como fracción de distancia recorrida en la vuelta más rápida y se reutilizan en todas las vueltas.
 - **Downsampling** obligatorio (p. ej. un punto cada ~20 m de distancia, o ~150–250 puntos por vuelta).
 - Coordenadas redondeadas a enteros.
 
@@ -94,7 +97,7 @@ pos/<DRIVER>.json    # trayectoria por vuelta de un piloto (se carga bajo demand
 ## 6. Pendiente de confirmar con Dani
 
 - [ ] Forma exacta de la Vista A (ejes) — Dani comparte la visualización de referencia.
-- [ ] Carrera y año.
+- [x] Carrera y año: GP de Abu Dabi 2021, carrera (Dani, 15-oct-2026).
 - [ ] Color de la trayectoria: por sector o por velocidad.
 - [ ] Pregunta de análisis del §5.
 

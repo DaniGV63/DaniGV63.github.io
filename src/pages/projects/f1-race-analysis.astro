@@ -1,14 +1,112 @@
 ---
-// Placeholder. Spec: docs/F1_SPEC.md. D3 is loaded only on this page.
+// Spec: docs/F1_SPEC.md. D3 is loaded only on this page (via RaceExplorer).
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import RaceExplorer from '../../components/f1/RaceExplorer.astro';
+import meta from '../../data/f1/2021-abu-dhabi-grand-prix-r/meta.json';
+import laps from '../../data/f1/2021-abu-dhabi-grand-prix-r/laps.json';
+import track from '../../data/f1/2021-abu-dhabi-grand-prix-r/track.json';
+import { formatLapTime } from '../../scripts/f1/types';
+
+const folder = '2021-abu-dhabi-grand-prix-r';
+const winner = meta.drivers.find((d) => d.finish === 1);
+
+const timed = laps.filter((row) => row.isAccurate && row.lapTime !== null);
+const fastest = timed.reduce((best, row) => (row.lapTime! < best.lapTime! ? row : best));
+const fastestDriver = meta.drivers.find((d) => d.code === fastest.driver);
+
+// A lap counts as "under safety car" when most drivers had track status 4 in it.
+const scLaps = Array.from({ length: meta.totalLaps }, (_, i) => i + 1).filter((lap) => {
+  const rows = laps.filter((row) => row.lap === lap);
+  return rows.filter((row) => row.trackStatus?.includes('4')).length > rows.length / 2;
+});
+
+function toRanges(numbers: number[]): string {
+  const ranges: string[] = [];
+  for (const n of numbers) {
+    const last = ranges.length - 1;
+    const match = last >= 0 ? ranges[last]!.split('–') : [];
+    if (match.length && Number(match[match.length - 1]) === n - 1) {
+      ranges[last] = `${match[0]}–${n}`;
+    } else {
+      ranges.push(String(n));
+    }
+  }
+  return ranges.join(', ');
+}
+
+const classification = meta.drivers
+  .filter((d) => d.finish !== null)
+  .slice(0, 10)
+  .map((driver) => {
+    const rows = laps.filter((row) => row.driver === driver.code);
+    const best = rows
+      .filter((row) => row.isAccurate && row.lapTime !== null)
+      .reduce<number | null>((min, row) => (min === null || row.lapTime! < min ? row.lapTime : min), null);
+    return { ...driver, best, stops: rows.filter((row) => row.pitIn).length };
+  });
 ---
 
-<BaseLayout title="F1 Race Analysis — Daniel Gómez Verde">
+<BaseLayout
+  title="F1 Race Analysis — Daniel Gómez Verde"
+  description="Interactive analysis of the 2021 Abu Dhabi Grand Prix: sector times per lap linked to the driver's path on track."
+>
   <div class="container intro">
+    <p class="label">Project · work in progress</p>
     <h1>F1 Race Analysis</h1>
-    <p>Work in progress.</p>
-    <p><a href="/">← Back to the home page</a></p>
+    <p class="intro__lead">
+      Lap-by-lap sector times for the {meta.year} {meta.event}, linked to the path
+      each driver took on track. First iteration: the chart layout will change.
+    </p>
   </div>
+
+  <div class="container">
+    <RaceExplorer folder={folder} meta={meta} laps={laps} track={track} />
+  </div>
+
+  <section class="container facts" aria-labelledby="facts-title">
+    <h2 id="facts-title" class="label">At a glance</h2>
+    <ul class="facts__list">
+      <li><strong>{meta.totalLaps}</strong> laps at {meta.circuit}</li>
+      {winner && <li>Winner: <strong>{winner.name}</strong> ({winner.team})</li>}
+      <li>
+        Fastest lap: <strong>{fastestDriver?.name ?? fastest.driver}</strong>,
+        lap {fastest.lap}, <span class="mono">{formatLapTime(fastest.lapTime)}</span>
+      </li>
+      {scLaps.length > 0 && <li>Laps with a safety-car period: <span class="mono">{toRanges(scLaps)}</span></li>}
+    </ul>
+
+    <div class="facts__table">
+      <table>
+        <caption>Top ten classified</caption>
+        <thead>
+          <tr><th scope="col">Pos</th><th scope="col">Driver</th><th scope="col" class="facts__team">Team</th><th scope="col">Best lap</th><th scope="col">Stops</th></tr>
+        </thead>
+        <tbody>
+          {classification.map((row) => (
+            <tr>
+              <td class="mono">{row.finish}</td>
+              <td>{row.name}</td>
+              <td class="facts__team">{row.team}</td>
+              <td class="mono">{formatLapTime(row.best)}</td>
+              <td class="mono">{row.stops}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="container method" aria-labelledby="method-title">
+    <h2 id="method-title" class="label">Data</h2>
+    <p>
+      Lap and sector times and car positions come from the open-source FastF1
+      library. A local Python pipeline cleans them, thins each lap to a point
+      every 50 m and writes static JSON that the page loads on demand.
+    </p>
+  </section>
+
+  <div class="container back"><a href="/">← Back to the home page</a></div>
+
   <Fragment slot="legal">
     Data via the open-source FastF1 library. This is an unofficial,
     non-commercial project and is not associated with Formula 1. F1 and related
@@ -19,8 +117,62 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 <style>
   .intro {
     display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-12) var(--space-6);
+  }
+
+  .intro__lead {
+    color: var(--color-text-muted);
+  }
+
+  .facts,
+  .method {
+    display: grid;
     gap: var(--space-4);
-    padding-block: var(--space-12);
-    justify-items: start;
+    margin-top: var(--space-12);
+  }
+
+  .facts__list {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .facts__table {
+    overflow-x: auto;
+  }
+
+  .facts__table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+  }
+
+  .facts__table caption {
+    text-align: left;
+    padding-bottom: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .facts__table th,
+  .facts__table td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .back {
+    margin-top: var(--space-12);
+  }
+
+  @media (max-width: 540px) {
+    .facts__team {
+      display: none;
+    }
+
+    .facts__table th,
+    .facts__table td {
+      padding-inline: var(--space-2);
+    }
   }
 </style>

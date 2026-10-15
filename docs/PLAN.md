@@ -15,7 +15,7 @@ Marcar con [x] al terminar. Cada fase acaba con `npm run build` sin errores y un
 
 ## Fase 2 — Proyecto estrella: F1
 - [ ] Confirmar la spec con la visualización de referencia (`docs/F1_SPEC.md` §6).
-- [ ] Pipeline Python + tests + JSON generados y commiteados.
+- [x] Pipeline Python + tests + JSON generados (Abu Dabi 2021, 1.27 MB). Falta commitear.
 - [ ] Vista A + Vista B enlazadas en D3.
 - [ ] Texto del análisis (pregunta, método, resultado, limitaciones) + aviso legal.
 - [ ] Revisión móvil y accesibilidad.
