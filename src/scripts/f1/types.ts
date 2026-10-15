@@ -50,6 +50,13 @@ export interface PosFile {
   laps: Record<string, PosLap>;
 }
 
+/** Seconds spent in each equal-distance part of a lap, per lap number. */
+export interface SegFile {
+  driver: string;
+  segments: number;
+  laps: Record<string, number[]>;
+}
+
 export interface RaceData {
   folder: string;
   meta: RaceMeta;

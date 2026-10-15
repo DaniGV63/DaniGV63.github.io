@@ -1,8 +1,7 @@
 import { renderLapsChart } from './lapsChart';
+import { colorFor, initPicker, onChange, picker, setPrimary } from './picker';
 import { renderTrackMap } from './trackMap';
 import {
-  FALLBACK_COLOR,
-  TEAM_LOGOS,
   formatLapTime,
   sectorValue,
   type LapRow,
@@ -26,9 +25,7 @@ function byId<T extends HTMLElement>(id: string): T {
 }
 
 const data = JSON.parse(byId('f1-data').textContent ?? '{}') as RaceData;
-const codes = new Set(data.laps.map((row) => row.driver));
-const classified = data.meta.drivers.filter((d) => codes.has(d.code));
-const colors = new Map(classified.map((d) => [d.code, d.teamColor ?? FALLBACK_COLOR]));
+initPicker(data);
 
 function fastestLapOf(driver: string): number {
   const rows = data.laps.filter((r) => r.driver === driver && r.isAccurate && r.lapTime);
@@ -36,11 +33,11 @@ function fastestLapOf(driver: string): number {
   return best?.lap ?? 1;
 }
 
-const top = classified.slice(0, 3).map((d) => d.code);
+// Drivers and colours come from the shared picker; only lap and axis are local.
 const selection: Selection = {
-  drivers: top,
-  driver: top[0]!,
-  lap: fastestLapOf(top[0]!),
+  drivers: picker.drivers,
+  driver: picker.primary,
+  lap: fastestLapOf(picker.primary),
   yMode: 'delta',
 };
 
@@ -62,50 +59,16 @@ const mapBox = byId('f1-track-map');
 const tooltip = byId('f1-tooltip');
 const slider = byId<HTMLInputElement>('f1-lap');
 const readout = byId('f1-lap-out');
-const chips = byId('f1-chips');
 const tableBody = byId('f1-table-body');
 const mapTitle = byId('f1-map-title');
 
 function pick(driver: string, lap: number): void {
-  if (!selection.drivers.includes(driver)) selection.drivers.push(driver);
-  selection.driver = driver;
   selection.lap = lap;
-  render();
-}
-
-function renderChips(): void {
-  chips.replaceChildren();
-  for (const driver of classified) {
-    const on = selection.drivers.includes(driver.code);
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'f1-chip';
-    button.setAttribute('aria-pressed', String(on));
-    button.title = `${driver.name} (${driver.team})`;
-    const swatch = document.createElement('span');
-    swatch.className = 'f1-chip__swatch';
-    swatch.style.background = colors.get(driver.code) ?? FALLBACK_COLOR;
-    button.append(swatch);
-    const logo = TEAM_LOGOS[driver.team];
-    if (logo) {
-      const image = document.createElement('img');
-      image.src = `/f1/${logo}.png`;
-      image.alt = '';
-      image.width = 20;
-      image.height = 20;
-      image.className = 'f1-chip__logo';
-      button.append(image);
-    }
-    button.append(driver.code);
-    button.addEventListener('click', () => {
-      const index = selection.drivers.indexOf(driver.code);
-      if (index >= 0 && selection.drivers.length > 1) selection.drivers.splice(index, 1);
-      else if (index < 0) selection.drivers.push(driver.code);
-      if (!selection.drivers.includes(selection.driver)) selection.driver = selection.drivers[0]!;
-      render();
-    });
-    chips.append(button);
+  if (driver !== picker.primary || !picker.drivers.includes(driver)) {
+    setPrimary(driver); // notifies, which re-renders through onChange
+    return;
   }
+  render();
 }
 
 function renderTable(): void {
@@ -157,15 +120,16 @@ async function renderMap(): Promise<void> {
 }
 
 function render(): void {
+  selection.drivers = picker.drivers;
+  selection.driver = picker.primary;
   slider.value = String(selection.lap);
   readout.textContent = `Lap ${selection.lap} / ${data.meta.totalLaps}`;
-  renderChips();
   renderLapsChart({
     container: chartBox,
     tooltip,
     laps: data.laps,
     selection,
-    colors,
+    colors: new Map(picker.drivers.map((code) => [code, colorFor(code)])),
     onPick: pick,
   });
   renderTable();
@@ -192,5 +156,6 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowRight') stepLap(1);
 });
 new ResizeObserver(() => render()).observe(chartBox);
+onChange(render);
 
 render();

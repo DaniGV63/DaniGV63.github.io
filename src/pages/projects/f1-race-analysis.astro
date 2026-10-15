@@ -2,6 +2,8 @@
 // Spec: docs/F1_SPEC.md. D3 is loaded only on this page (via RaceExplorer).
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import RaceExplorer from '../../components/f1/RaceExplorer.astro';
+import LapComparison from '../../components/f1/LapComparison.astro';
+import DriverPicker from '../../components/f1/DriverPicker.astro';
 import meta from '../../data/f1/2021-abu-dhabi-grand-prix-r/meta.json';
 import laps from '../../data/f1/2021-abu-dhabi-grand-prix-r/laps.json';
 import track from '../../data/f1/2021-abu-dhabi-grand-prix-r/track.json';
@@ -60,6 +62,12 @@ const classification = meta.drivers
   </div>
 
   <div class="container">
+    <DriverPicker />
+    <header class="race-head">
+      <img src="/f1/f1.svg" alt="Formula 1" width="84" height="21" />
+      <p class="race-head__title">{meta.year} · {meta.event} · Race</p>
+    </header>
+    <LapComparison />
     <RaceExplorer folder={folder} meta={meta} laps={laps} track={track} />
   </div>
 
@@ -123,6 +131,20 @@ const classification = meta.drivers
 
   .intro__lead {
     color: var(--color-text-muted);
+  }
+
+  .race-head {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-8);
+  }
+
+  .race-head__title {
+    font-size: var(--step-1);
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
   }
 
   .facts,

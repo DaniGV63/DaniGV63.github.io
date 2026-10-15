@@ -1,0 +1,15 @@
+---
+// Shared driver selection: both charts below react to these chips.
+// Logic and colour assignment live in src/scripts/f1/picker.ts.
+---
+
+<section class="f1 picker" aria-labelledby="picker-title">
+  <div>
+    <p class="f1__kicker" id="picker-title">Choose the drivers</p>
+    <p class="f1__hint">
+      Select two or more. Colours are assigned so the drivers are easy to tell apart,
+      even team-mates.
+    </p>
+  </div>
+  <div class="f1__chips" id="f1-chips" role="group" aria-label="Drivers"></div>
+</section>

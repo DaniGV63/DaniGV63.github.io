@@ -1,0 +1,271 @@
+---
+// Prototype: lap-by-lap comparison of two drivers. Reuses the JSON payload
+// (#f1-data) that RaceExplorer renders on the same page.
+---
+
+<section class="f1 cmp" aria-labelledby="cmp-title">
+  <div class="f1__bar">
+    <div>
+      <p class="f1__kicker" id="cmp-title">Who was faster, lap by lap</p>
+      <p class="f1__hint">
+        Each line is a lap, split into 25 equal parts of the circuit. Click a lap to colour the
+        circuit from the start line. ↑ ↓ change lap.
+      </p>
+    </div>
+  </div>
+
+  <ul class="cmp__legend" id="cmp-legend" aria-label="Legend"></ul>
+
+  <div class="f1__views cmp__views">
+    <div class="f1__view">
+      <h3 class="f1__title">Laps</h3>
+      <div
+        class="cmp__rows"
+        id="cmp-rows"
+        tabindex="0"
+        role="group"
+        aria-label="Laps. Use the up and down arrow keys to change lap."
+      >
+      </div>
+      <div class="f1__tooltip" id="cmp-tooltip" hidden></div>
+    </div>
+    <div class="f1__view cmp__side">
+      <div class="cmp__head">
+        <h3 class="f1__title">Circuit</h3>
+        <div class="cmp__mode" role="group" aria-label="Circuit view">
+          <button type="button" id="cmp-mode-2d" aria-pressed="true">2D</button>
+          <button type="button" id="cmp-mode-3d" aria-pressed="false">3D</button>
+        </div>
+      </div>
+      <div class="f1__map cmp__mapwrap" id="cmp-map"></div>
+      <p class="cmp__hint3d" id="cmp-hint3d" hidden>
+        3D: all laps stacked, lap 1 on top. Drag to orbit · scroll or pinch to zoom ·
+        right-drag to pan · double-click to reset.
+      </p>
+      <div class="cmp__info" id="cmp-info" aria-live="polite">
+        <p>Pick a lap on the left to colour the circuit.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .cmp,
+  .picker {
+    margin-top: var(--space-6);
+  }
+
+  .picker {
+    border-top-width: 4px;
+  }
+
+  .cmp__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--f1-muted);
+  }
+
+  .cmp__legend span {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    border-radius: 2px;
+    vertical-align: -2px;
+  }
+
+  .cmp__rows {
+    outline-offset: 2px;
+  }
+
+  .cmp__empty {
+    padding: var(--space-6) var(--space-2);
+    color: var(--f1-muted);
+  }
+
+  .cmp__rows svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .cmp-row {
+    cursor: pointer;
+  }
+
+  .cmp-hit {
+    fill: transparent;
+  }
+
+  .cmp-lap {
+    fill: var(--f1-muted);
+    font-family: var(--font-mono);
+    font-size: 9px;
+  }
+
+  .cmp-lap--on {
+    fill: var(--f1-text);
+    font-weight: 700;
+  }
+
+  .cmp-delta {
+    font-family: var(--font-mono);
+    font-size: 9px;
+  }
+
+  .cmp-missing {
+    stroke: var(--f1-line);
+    stroke-dasharray: 2 3;
+  }
+
+  .cmp-selected {
+    fill: none;
+    stroke: var(--f1-ink);
+    stroke-width: 1.5;
+  }
+
+  .cmp__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+
+  .cmp__head .f1__title {
+    margin-bottom: 0;
+  }
+
+  .cmp__mode {
+    display: inline-flex;
+    border: 1px solid var(--f1-line);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .cmp__mode button {
+    border: 0;
+    border-radius: 0;
+    padding: 2px var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+
+  .cmp__mode button[aria-pressed='true'] {
+    opacity: 1;
+    background: var(--f1-red);
+    color: #fff;
+  }
+
+  .cmp__mapwrap {
+    position: relative;
+    transition: height 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .cmp-canvas {
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: grab;
+  }
+
+  .cmp-canvas:active {
+    cursor: grabbing;
+  }
+
+  .cmp__mapwrap.is-3d .cmp-canvas {
+    display: block;
+  }
+
+  .cmp__mapwrap.is-3d svg {
+    visibility: hidden;
+  }
+
+  .cmp__hint3d {
+    margin-top: var(--space-2);
+    font-size: 0.75rem;
+    color: var(--f1-muted);
+  }
+
+  .cmp-sector {
+    stroke: var(--f1-text);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .cmp-startlabel {
+    fill: var(--f1-muted);
+    font-family: var(--font-mono);
+  }
+
+  .cmp-base {
+    fill: none;
+    stroke: var(--f1-line);
+    stroke-linejoin: round;
+  }
+
+  .cmp-seg {
+    fill: none;
+    stroke-linecap: butt;
+    stroke-linejoin: round;
+    transition:
+      stroke 0.35s,
+      opacity 0.35s;
+  }
+
+  .cmp__info {
+    display: grid;
+    gap: var(--space-1);
+    margin-top: var(--space-3);
+    font-size: var(--step--1);
+  }
+
+  .cmp__info h4 {
+    margin-bottom: var(--space-1);
+    font-style: italic;
+    text-transform: uppercase;
+  }
+
+  .cmp-info__row {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-block: 2px;
+    border-bottom: 1px solid var(--f1-line);
+  }
+
+  .cmp-info__row span {
+    color: var(--f1-muted);
+  }
+
+  .cmp-info__row strong {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  @media (min-width: 900px) {
+    .cmp__views {
+      grid-template-columns: 1.05fr 1fr;
+      align-items: start;
+    }
+
+    .cmp__side {
+      position: sticky;
+      top: var(--space-4);
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/f1/compare';
+</script>

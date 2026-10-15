@@ -19,9 +19,8 @@ const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u
 
   <div class="f1__bar">
     <div>
-      <img class="f1__logo" src="/f1/f1.svg" alt="Formula 1" width="72" height="18" />
-      <p class="f1__kicker">{meta.year} · {meta.event} · {meta.session === 'Race' ? 'Race' : meta.session}</p>
-      <p class="f1__hint">Click a line to pick a lap. ← → change lap.</p>
+      <p class="f1__kicker">Sector times by lap</p>
+      <p class="f1__hint">Sector times by lap, for the drivers selected above. Click a line to pick a lap. ← → change lap.</p>
     </div>
     <label class="f1__field">
       <span>Y axis</span>
@@ -31,8 +30,6 @@ const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u
       </select>
     </label>
   </div>
-
-  <div class="f1__chips" id="f1-chips" role="group" aria-label="Drivers"></div>
 
   <div class="f1__lapbar">
     <button type="button" id="f1-prev" aria-label="Previous lap">‹</button>
