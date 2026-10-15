@@ -19,6 +19,16 @@
   font-display: swap;
 }
 
+/* Closest open-source match to the F1 broadcast typeface (the official one is
+   proprietary). Used only for the F1 banner title. */
+@font-face {
+  font-family: 'Saira Variable';
+  src: url('/fonts/saira-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Metric-matched system fallbacks so text does not jump when the fonts load. */
 @font-face {
   font-family: 'Inter Fallback';

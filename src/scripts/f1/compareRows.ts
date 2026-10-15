@@ -45,9 +45,8 @@ export function renderRows(options: RowsOptions): void {
   const { container, tooltip, totalLaps, segments, laps, selectedLap } = options;
   const { codes, colors, cornerOf, sectors, onPick } = options;
   const width = Math.max(container.clientWidth, 260);
-  const wide = width >= 440;
-  const rightGutter = wide ? 60 : 6;
-  const rowHeight = wide ? 11 : 9;
+  const rightGutter = 6;
+  const rowHeight = width >= 440 ? 11 : 9;
   const height = TOP + totalLaps * rowHeight + 6;
   const cell = (width - GUTTER - rightGutter) / segments;
 
@@ -104,16 +103,6 @@ export function renderRows(options: RowsOptions): void {
           .attr('fill', part.winner < 0 ? 'var(--f1-muted)' : colors[part.winner]!)
           .attr('opacity', part.winner < 0 ? 0.55 * dim : opacityFor(part.margin) * dim);
       });
-      // Lap summary: who was fastest and by how much (wide panels only).
-      if (wide) row
-        .append('text')
-        .attr('class', 'cmp-delta')
-        .attr('x', width - rightGutter + 6)
-        .attr('y', y + rowHeight - 2)
-        .attr('fill', colors[result.leader]!)
-        .text(
-          `${codes[result.leader]} ${result.leaderGap.toFixed(2)}${result.flag ? ' ' + result.flag : ''}`,
-        );
     } else {
       row
         .append('line')

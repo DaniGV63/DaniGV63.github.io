@@ -232,24 +232,30 @@ export function createStacked(
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    ctx.fillStyle = muted;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `${Math.max(9, stroke * 3.2 * baseScale)}px ui-monospace, Consolas, monospace`;
-    track.corners.forEach((c, i) => {
-      const [px, py] = project(corners[i]![0], corners[i]![1], topZ);
-      ctx.fillText(c.number, px, py);
-    });
+    // corner numbers belong to the flat map; they fade out as the stack opens
+    if (m < 1) {
+      ctx.globalAlpha = 1 - m;
+      ctx.fillStyle = muted;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `${Math.max(9, stroke * 3.2 * baseScale)}px ui-monospace, Consolas, monospace`;
+      track.corners.forEach((c, i) => {
+        const [px, py] = project(corners[i]![0], corners[i]![1], topZ);
+        ctx.fillText(c.number, px, py);
+      });
+      ctx.globalAlpha = 1;
+    }
 
-    if (m > 0.6) {
+    // only the selected lap is labelled in the stack
+    if (m > 0.6 && selected !== null) {
       ctx.globalAlpha = (m - 0.6) / 0.4;
-      ctx.font = '600 11px ui-monospace, Consolas, monospace';
+      ctx.fillStyle = ink;
+      ctx.font = '700 12px ui-monospace, Consolas, monospace';
       ctx.textAlign = 'right';
-      const left = outline.reduce((a, b) => (b[0] < a[0] ? b : a));
-      const [tx, ty] = project(left[0], left[1], topZ);
-      const [bx, by] = project(left[0], left[1], zOf(totalLaps));
-      ctx.fillText('Lap 1', tx - 12, ty);
-      ctx.fillText(`Lap ${totalLaps}`, bx - 12, by);
+      ctx.textBaseline = 'middle';
+      const left = outline.reduce((p, q) => (q[0] < p[0] ? q : p));
+      const [tx, ty] = project(left[0], left[1], zOf(selected));
+      ctx.fillText(`Lap ${selected}`, tx - 14, ty);
       ctx.globalAlpha = 1;
     }
 
