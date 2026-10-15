@@ -5,6 +5,7 @@ import Section from '../components/Section.astro';
 import StrengthGrid from '../components/StrengthGrid.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
+import F1Banner from '../components/F1Banner.astro';
 import TagList from '../components/TagList.astro';
 import profile from '../data/profile.json';
 
@@ -30,7 +31,10 @@ const otherProjects = profile.projects.filter((p) => p.id !== featuredProject?.i
             tags={featuredProject.tags}
             status={featuredProject.status}
             featured
-          />
+            banner
+          >
+            <F1Banner slot="banner" />
+          </ProjectCard>
         )
       }
       <div class="work__row">

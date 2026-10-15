@@ -9,13 +9,16 @@ interface Props {
   tags: readonly string[];
   status?: string;
   featured?: boolean;
+  /** Dark banner variant; pass the artwork through the `banner` slot. */
+  banner?: boolean;
 }
 
-const { title, summary, href, tags, status, featured = false } = Astro.props;
+const { title, summary, href, tags, status, featured = false, banner = false } = Astro.props;
 const external = isExternal(href);
 ---
 
-<article class:list={['card', { 'card--featured': featured }]}>
+<article class:list={['card', { 'card--featured': featured, 'card--banner': banner }]}>
+  {banner && <slot name="banner" />}
   <div class="card__head">
     <h3 class="card__title">
       <a
@@ -118,5 +121,44 @@ const external = isExternal(href);
   .card__summary {
     color: var(--color-text-muted);
     flex: 1;
+  }
+
+  /* Banner variant: always dark, like a broadcast graphic. */
+  .card--banner {
+    min-height: 11rem;
+    isolation: isolate;
+    background: #0b0b0f;
+    border-color: #2a2a35;
+    border-top: 3px solid #e10600;
+    color: #f5f5f7;
+    transition:
+      border-color 0.3s,
+      box-shadow 0.3s;
+  }
+
+  .card--banner:hover {
+    border-color: #e10600;
+    box-shadow: 0 0 0 1px rgb(225 6 0 / 0.5);
+  }
+
+  .card--banner .card__link {
+    color: #fff;
+  }
+
+  .card--banner .card__summary {
+    color: #c8c8d2;
+    max-width: 46ch;
+  }
+
+  .card--banner .card__status {
+    color: #fff;
+    border-color: #e10600;
+    background: rgb(225 6 0 / 0.25);
+  }
+
+  .card--banner :global(.tags__item) {
+    color: #c8c8d2;
+    border-color: #3a3a46;
+    background: rgb(11 11 15 / 0.6);
   }
 </style>
