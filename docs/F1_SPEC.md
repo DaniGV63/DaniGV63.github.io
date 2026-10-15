@@ -73,6 +73,7 @@ pos/<DRIVER>.json    # trayectoria por vuelta de un piloto (se carga bajo demand
 { "driver": "VER", "laps": { "1": { "p": [x0, y0, x1, y1, ...], "s": [i2, i3] } } }
 ```
 - `p` es una lista plana de pares x,y; `s` son los índices de punto (no de valor) donde empiezan S2 y S3.
+- `seg/<DRIVER>.json` (comparación entre pilotos): `{ "driver": "VER", "segments": 25, "laps": { "1": [t0, ..., t24] } }`, segundos que tarda el piloto en cada una de las 25 partes de igual distancia de la vuelta. La distancia sale de integrar la velocidad de telemetría entre el inicio y el fin oficial de la vuelta (las partes suman el tiempo de vuelta). No se usan las posiciones X/Y para esto: tienen jitter temporal de décimas de segundo, mayor que las diferencias entre pilotos. Resolución práctica ≈ ±0.05 s por parte.
 - Los límites de sector se calculan como fracción de distancia recorrida en la vuelta más rápida y se reutilizan en todas las vueltas.
 - **Downsampling** obligatorio (p. ej. un punto cada ~20 m de distancia, o ~150–250 puntos por vuelta).
 - Coordenadas redondeadas a enteros.

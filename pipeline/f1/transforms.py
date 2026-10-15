@@ -77,6 +77,35 @@ def sector_split_indices(
     return [int(np.searchsorted(distance, f * total)) for f in fractions]
 
 
+def segment_times(
+    seconds: np.ndarray,
+    speed_ms: np.ndarray,
+    start: float,
+    end: float,
+    segments: int,
+) -> list[float]:
+    """Seconds spent in each of `segments` equal parts of a lap's distance.
+
+    Distance comes from integrating the car's speed between the real start
+    and end of the lap, so the parts add up to the lap time. Position samples
+    are not used here: they have timing jitter of a few tenths of a second,
+    far bigger than the differences between drivers.
+    """
+    if len(seconds) < 4 or end <= start:
+        return []
+    times = np.concatenate(([start], np.clip(seconds, start, end), [end]))
+    times = np.maximum.accumulate(times)
+    speeds = np.concatenate(([speed_ms[0]], speed_ms, [speed_ms[-1]]))
+    steps = np.diff(times) * (speeds[1:] + speeds[:-1]) / 2.0
+    distance = np.concatenate(([0.0], np.cumsum(steps)))
+    if distance[-1] <= 0:
+        return []
+    edges = np.interp(
+        np.linspace(0.0, 1.0, segments + 1), distance / distance[-1], times
+    )
+    return np.round(np.diff(edges), 3).tolist()
+
+
 def validate_laps(rows: list[dict[str, Any]], tolerance: float = 0.5) -> list[str]:
     """Return human-readable problems found in lap rows (empty list = valid)."""
     errors: list[str] = []

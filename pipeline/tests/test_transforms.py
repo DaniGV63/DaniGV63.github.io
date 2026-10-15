@@ -10,6 +10,7 @@ from transforms import (  # noqa: E402
     downsample_indices,
     normalise_hex,
     sector_split_indices,
+    segment_times,
     validate_laps,
 )
 
@@ -64,3 +65,25 @@ def test_normalise_hex():
     assert normalise_hex("0600ef") == "#0600EF"
     assert normalise_hex("nan") is None
     assert normalise_hex(float("nan")) is None
+
+
+def test_segment_times_constant_speed_gives_equal_parts_and_lap_time():
+    seconds = np.linspace(10.1, 89.9, 300)
+    speed = np.full(300, 60.0)
+    parts = segment_times(seconds, speed, 10.0, 90.0, 4)
+    assert len(parts) == 4
+    assert abs(sum(parts) - 80.0) < 0.01
+    assert max(parts) - min(parts) < 0.01
+
+
+def test_segment_times_slow_first_half_takes_longer():
+    seconds = np.linspace(0.05, 39.95, 200)
+    speed = np.where(seconds < 20, 30.0, 90.0)  # same distance, 3x slower
+    parts = segment_times(seconds, speed, 0.0, 40.0, 2)
+    assert parts[0] > 2 * parts[1]
+    assert abs(sum(parts) - 40.0) < 0.01
+
+
+def test_segment_times_degenerate_lap():
+    assert segment_times(np.array([1.0, 2.0]), np.array([0.0, 0.0]), 0.0, 3.0, 5) == []
+    assert segment_times(np.zeros(6), np.zeros(6), 0.0, 3.0, 5) == []

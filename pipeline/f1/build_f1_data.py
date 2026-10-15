@@ -30,6 +30,7 @@ from transforms import (
     downsample_indices,
     normalise_hex,
     sector_split_indices,
+    segment_times,
     slugify,
     to_seconds,
     validate_laps,
@@ -46,6 +47,7 @@ MAX_TOTAL_BYTES = 2_000_000
 
 LAP_SPACING = 500.0  # 50 m between kept samples of a driver lap
 OUTLINE_SPACING = 300.0  # 30 m for the circuit outline
+SEGMENTS = 25  # equal-distance parts per lap used to compare drivers
 
 
 def write_json(path: Path, data: Any) -> int:
@@ -172,12 +174,20 @@ def build_track(session: Session) -> tuple[dict[str, Any], tuple[float, float]]:
 
 
 def build_positions(
-    session: Session, code: str, fractions: tuple[float, float]
-) -> tuple[dict[str, Any], int]:
-    """Per-lap downsampled trajectory of one driver; returns data and laps skipped."""
+    session: Session,
+    code: str,
+    fractions: tuple[float, float],
+    segments: int,
+) -> tuple[dict[str, Any], dict[str, Any], int]:
+    """Per-lap trajectory and segment times of one driver, plus laps skipped."""
     laps = session.laps.pick_drivers(code)
-    pos = session.pos_data[laps.iloc[0]["DriverNumber"]]
+    number = laps.iloc[0]["DriverNumber"]
+    pos = session.pos_data[number]
+    car = session.car_data[number]
+    car_seconds = car["SessionTime"].dt.total_seconds().to_numpy()
+    car_speed = car["Speed"].to_numpy(dtype=float) / 3.6
     out: dict[str, Any] = {}
+    seg_out: dict[str, Any] = {}
     skipped = 0
     for lap in laps.itertuples():
         start = lap.LapStartTime
@@ -197,7 +207,19 @@ def build_positions(
             "p": flat,
             "s": sector_split_indices(dist[keep], fractions),
         }
-    return {"driver": code, "laps": out}, skipped
+        lo, hi = np.searchsorted(
+            car_seconds, [start.total_seconds(), lap.Time.total_seconds()]
+        )
+        seg_out[str(int(lap.LapNumber))] = segment_times(
+            car_seconds[lo:hi],
+            car_speed[lo:hi],
+            start.total_seconds(),
+            lap.Time.total_seconds(),
+            segments,
+        )
+    pos_data = {"driver": code, "laps": out}
+    seg_data = {"driver": code, "segments": segments, "laps": seg_out}
+    return pos_data, seg_data, skipped
 
 
 def parse_args() -> argparse.Namespace:
@@ -206,6 +228,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--event", required=True, help='e.g. "Abu Dhabi Grand Prix"')
     parser.add_argument("--session", default="R", help="R = race (default)")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--segments", type=int, default=SEGMENTS)
     return parser.parse_args()
 
 
@@ -234,9 +257,14 @@ def main() -> None:
 
     skipped_total = 0
     for code in codes:
-        data, skipped = build_positions(session, code, fractions)
+        data, seg_data, skipped = build_positions(
+            session, code, fractions, args.segments
+        )
         skipped_total += skipped
         sizes[f"pos/{code}.json"] = write_json(out_dir / "pos" / f"{code}.json", data)
+        sizes[f"seg/{code}.json"] = write_json(
+            out_dir / "seg" / f"{code}.json", seg_data
+        )
 
     total = sum(sizes.values())
     print(f"\n{folder}: {len(lap_rows)} lap rows, {len(codes)} drivers, {total_laps} laps")
