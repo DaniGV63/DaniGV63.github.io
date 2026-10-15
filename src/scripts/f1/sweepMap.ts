@@ -1,6 +1,6 @@
 import { select } from 'd3';
 import { carFill, CAR_PARTS, CAR_SCALE } from './carIcon';
-import { circuitView, finishLine, headingAt } from './circuit';
+import { circuitView, finishLine, headingAt, sectorMarks } from './circuit';
 import type { TrackData } from './types';
 
 const SUBPOINTS = 6; // points per part so curves stay smooth
@@ -32,7 +32,7 @@ export function createSweepMap(
   segments: number,
 ): SweepMap {
   const view = circuitView(track);
-  const { outline, corners, sample, stroke } = view;
+  const { outline, sample, stroke } = view;
 
   const svg = select(container)
     .append('svg')
@@ -57,18 +57,30 @@ export function createSweepMap(
     return path;
   });
 
-  svg
-    .append('g')
-    .selectAll('text')
-    .data(track.corners)
-    .join('text')
-    .attr('class', 'f1-corner')
-    .attr('x', (_, i) => corners[i]![0])
-    .attr('y', (_, i) => corners[i]![1])
-    .attr('font-size', stroke * 3.2)
-    .text((c) => c.number);
+  // sector ends and names (no corner numbers on this map)
+  const sectors = sectorMarks(view, track);
+  const sectorLayer = svg.append('g').attr('class', 'cmp-sectors');
+  sectors.ticks.forEach(([p, q]) => {
+    sectorLayer
+      .append('line')
+      .attr('x1', p[0])
+      .attr('y1', p[1])
+      .attr('x2', q[0])
+      .attr('y2', q[1])
+      .attr('stroke-width', stroke * 0.32);
+  });
+  sectors.labels.forEach((label) => {
+    sectorLayer
+      .append('text')
+      .attr('class', 'cmp-sector-label')
+      .attr('x', label.at[0])
+      .attr('y', label.at[1])
+      .attr('font-size', stroke * 3.4)
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'middle')
+      .text(label.text);
+  });
 
-  const start = outline[0]!;
   const line = finishLine(view);
   const flag = svg.append('g').attr('class', 'cmp-finish');
   for (const check of line.checks) {
@@ -83,15 +95,6 @@ export function createSweepMap(
     .attr('fill', 'none')
     .attr('stroke', '#ffffff')
     .attr('stroke-width', stroke * 0.14);
-  svg
-    .append('text')
-    .attr('class', 'cmp-startlabel')
-    .attr('x', start[0] + stroke * 3)
-    .attr('y', start[1] + stroke * 4.5)
-    .attr('font-size', stroke * 2.6)
-    .attr('text-anchor', 'start')
-    .text('START');
-
   const car = svg.append('g').attr('class', 'cmp-car').attr('display', 'none');
   const carShapes = CAR_PARTS.map((part) => car.append('path').attr('d', part.d));
   const paintCar = (livery: string): void => {

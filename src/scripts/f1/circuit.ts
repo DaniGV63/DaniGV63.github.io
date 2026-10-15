@@ -137,3 +137,67 @@ export function finishLine(view: CircuitView): { checks: Check[]; border: Point[
   ];
   return { checks, border };
 }
+
+export interface SectorMarks {
+  /** Short line across the track at the end of sector 1 and sector 2. */
+  ticks: [Point, Point][];
+  labels: { text: string; at: Point }[];
+}
+
+/** Where the sectors end and where to write S1, S2 and S3. */
+export function sectorMarks(view: CircuitView, track: TrackData): SectorMarks {
+  const boundaries = orient(track.sectorBoundaries as Point[], track.rotationDeg);
+  const fractionOf = ([bx, by]: Point): number => {
+    let best = 0;
+    let bestDistance = Infinity;
+    for (let i = 0; i <= 1000; i++) {
+      const [x, y] = view.sample(i / 1000);
+      const d = Math.hypot(x - bx, y - by);
+      if (d < bestDistance) {
+        bestDistance = d;
+        best = i / 1000;
+      }
+    }
+    return best;
+  };
+  const fractions = boundaries.map(fractionOf);
+  const cx = view.minX + view.width / 2;
+  const cy = view.minY + view.height / 2;
+
+  const ticks = fractions.map((f): [Point, Point] => {
+    const [x, y] = view.sample(f);
+    const h = headingAt(view.sample, f);
+    const nx = -Math.sin(h);
+    const ny = Math.cos(h);
+    const r = view.stroke * 2.4;
+    return [
+      [x - nx * r, y - ny * r],
+      [x + nx * r, y + ny * r],
+    ];
+  });
+
+  const edges = [0, ...fractions, 1];
+  const labels = ['S1', 'S2', 'S3'].map((text, i) => {
+    const mid = (edges[i]! + edges[i + 1]!) / 2;
+    const [x, y] = view.sample(mid);
+    const h = headingAt(view.sample, mid);
+    let nx = -Math.sin(h);
+    let ny = Math.cos(h);
+    // put the label on the side facing away from the middle of the circuit
+    if ((x - cx) * nx + (y - cy) * ny < 0) {
+      nx = -nx;
+      ny = -ny;
+    }
+    const d = view.stroke * 5.2;
+    let at: Point = [x + nx * d, y + ny * d];
+    const margin = view.stroke * 3;
+    const outside =
+      at[0] < view.minX + margin ||
+      at[0] > view.minX + view.width - margin ||
+      at[1] < view.minY + margin ||
+      at[1] > view.minY + view.height - margin;
+    if (outside) at = [x - nx * d, y - ny * d]; // not enough room: use the inner side
+    return { text, at };
+  });
+  return { ticks, labels };
+}

@@ -1,5 +1,5 @@
 import { carFill, CAR_PARTS, CAR_SCALE } from './carIcon';
-import { circuitView, finishLine, type Point } from './circuit';
+import { circuitView, finishLine, sectorMarks, type Point } from './circuit';
 import { opacityFor, type LapResult } from './compareRows';
 import type { TrackData } from './types';
 
@@ -47,11 +47,12 @@ export function createStacked(
   totalLaps: number,
 ): StackedView {
   const view = circuitView(track);
-  const { outline, corners, sample, stroke } = view;
+  const { outline, sample, stroke } = view;
   const reach = Math.max(view.width, view.height);
   const cx = view.minX + view.width / 2;
   const cy = view.minY + view.height / 2;
   const flag = finishLine(view);
+  const sectors = sectorMarks(view, track);
 
   const canvas = document.createElement('canvas');
   canvas.className = 'cmp-canvas';
@@ -232,19 +233,27 @@ export function createStacked(
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // corner numbers belong to the flat map; they fade out as the stack opens
-    if (m < 1) {
-      ctx.globalAlpha = 1 - m;
-      ctx.fillStyle = muted;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.font = `${Math.max(9, stroke * 3.2 * baseScale)}px ui-monospace, Consolas, monospace`;
-      track.corners.forEach((c, i) => {
-        const [px, py] = project(corners[i]![0], corners[i]![1], topZ);
-        ctx.fillText(c.number, px, py);
-      });
-      ctx.globalAlpha = 1;
-    }
+    // sector ends and names on the top lap
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 1.2;
+    ctx.globalAlpha = 0.8;
+    sectors.ticks.forEach(([p, q]) => {
+      const [x1, y1] = project(p[0], p[1], topZ);
+      const [x2, y2] = project(q[0], q[1], topZ);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    });
+    ctx.fillStyle = muted;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `600 ${Math.max(10, stroke * 3.4 * baseScale)}px ui-monospace, Consolas, monospace`;
+    sectors.labels.forEach((label) => {
+      const [px, py] = project(label.at[0], label.at[1], topZ);
+      ctx.fillText(label.text, px, py);
+    });
+    ctx.globalAlpha = 1;
 
     // only the selected lap is labelled in the stack
     if (m > 0.6 && selected !== null) {
