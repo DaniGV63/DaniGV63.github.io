@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "f1"))
 
-from build_f1_data import slugify, to_seconds  # noqa: E402
+from transforms import slugify, to_seconds  # noqa: E402
 
 
 def test_slugify():
