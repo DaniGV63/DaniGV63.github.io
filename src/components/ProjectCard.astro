@@ -13,9 +13,11 @@ interface Props {
   banner?: boolean;
   /** Accent colour of the banner variant (defaults to F1 red). */
   accent?: string;
+  /** Wordmark shown above the title (a dark/white mask of an SVG in public/). */
+  logo?: string;
 }
 
-const { title, summary, href, tags, status, featured = false, banner = false, accent } = Astro.props;
+const { title, summary, href, tags, status, featured = false, banner = false, accent, logo } = Astro.props;
 const external = isExternal(href);
 // Banner cards show the F1 symbol in place of a leading "F1".
 const symbolTitle = banner && title.startsWith('F1 ') ? title.slice(3) : null;
@@ -35,7 +37,12 @@ const symbolTitle = banner && title.startsWith('F1 ') ? title.slice(3) : null;
         aria-label={symbolTitle ? title : undefined}
       >
         {
-          symbolTitle ? (
+          logo ? (
+            <span class="card__brand card__brand--stack">
+              <span class="card__logo" style={`--logo:url(${logo})`} aria-hidden="true" />
+              <span>{title}</span>
+            </span>
+          ) : symbolTitle ? (
             <span class="card__brand">
               <img src="/f1/f1.svg" alt="" width="62" height="16" />
               <span class="card__brand-text">{symbolTitle}</span>
@@ -166,6 +173,35 @@ const symbolTitle = banner && title.startsWith('F1 ') ? title.slice(3) : null;
 
   .card--banner .card__link {
     color: #fff;
+  }
+
+  .card--banner .card__link:hover {
+    text-decoration: none;
+  }
+
+  .card--banner .card__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .card--banner .card__status {
+    order: -1;
+  }
+
+  .card__brand.card__brand--stack {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .card__logo {
+    display: block;
+    height: 1.1rem;
+    width: calc(1.1rem * 7.88);
+    background: #fff;
+    -webkit-mask: var(--logo) no-repeat left center / contain;
+    mask: var(--logo) no-repeat left center / contain;
   }
 
   .card__brand {

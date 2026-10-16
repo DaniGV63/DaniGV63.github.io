@@ -1,0 +1,501 @@
+---
+// Every number on this page is computed from src/data/energinet/meta.json, which
+// the pipeline (pipeline/energinet/) rewrites each day.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import GridExplorer from '../../components/energy/GridExplorer.astro';
+import meta from '../../data/energinet/meta.json';
+
+const urls = import.meta.glob('../../data/energinet/hours.json', {
+  query: '?url',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
+const hoursUrl = Object.values(urls)[0]!;
+
+const pct = (value: number, digits = 0): string => `${(value * 100).toFixed(digits)}%`;
+const number = (value: number): string => value.toLocaleString('en');
+const date = (iso: string): string =>
+  new Date(iso).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+const time = (iso: string): string =>
+  new Date(iso).toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Copenhagen',
+  });
+
+const clusters = meta.clusters;
+const last = clusters.length - 1;
+const names = clusters.map((cluster, index) => {
+  if (index === 0) return 'Low-wind hours';
+  if (index === last) return 'High-wind hours';
+  return cluster.label.startsWith('calm balancing') ? 'Quiet-balancing hours' : 'Mid-range hours';
+});
+const calm = clusters[0]!;
+const windy = clusters[last]!;
+const inertiaChange = windy.mean.inertia_dk2 / calm.mean.inertia_dk2 - 1;
+const nordicChange = windy.mean.inertia_nordic / calm.mean.inertia_nordic - 1;
+const model = meta.model;
+const apGain = model.withRenewables.average_precision / model.baseline.average_precision - 1;
+const columns = meta.correlations.columns;
+const localRow = meta.correlations.matrix[columns.indexOf('local_re_share')]!;
+const localVsDk1 = localRow[columns.indexOf('re_share_dk1')]!;
+const windVsInertia = meta.correlations.matrix[columns.indexOf('re_share_dk2')]![
+  columns.indexOf('inertia_dk2')
+]!;
+const aarhusMedian = meta.localOverall.median ?? 0;
+const day = meta.latestDay;
+const best = (key: 'localByHour' | 'localByMonth') =>
+  [...meta[key]].filter((p) => p.median !== null).sort((a, b) => b.median! - a.median!);
+const monthName = (n: number): string =>
+  new Date(2000, n - 1, 1).toLocaleString('en-GB', { month: 'short' });
+
+// Small static charts of Aarhus's renewable coverage.
+const W = 520;
+const H = 150;
+const PAD = { l: 34, r: 8, t: 8, b: 22 };
+const topValue = Math.max(0.2, ...meta.localByHour.map((p) => p.median ?? 0), ...meta.localByMonth.map((p) => p.median ?? 0));
+const yOf = (v: number): number => PAD.t + (1 - v / topValue) * (H - PAD.t - PAD.b);
+const hourPath = meta.localByHour
+  .map((p, i) => `${i === 0 ? 'M' : 'L'}${(PAD.l + (p.key / 23) * (W - PAD.l - PAD.r)).toFixed(1)},${yOf(p.median ?? 0).toFixed(1)}`)
+  .join('');
+const barWidth = (W - PAD.l - PAD.r) / 12;
+const ticks = [0, 0.05, 0.1, 0.15, 0.2].filter((v) => v <= topValue);
+---
+
+<BaseLayout
+  title="Danish Power System — Daniel Gómez Verde"
+  description="What kinds of hour does the Danish power system have, how do wind and solar relate to inertia and balancing, and how much of Aarhus's consumption do local renewables cover? Open Energinet data, refreshed daily."
+>
+  <div class="container intro">
+    <p class="label">Project</p>
+    <span class="brand-logo" aria-hidden="true"></span>
+    <h1>Danish Power System</h1>
+    <p class="intro__lead">
+      What kinds of hour does the Danish grid have, and what do they say about frequency
+      stability and about Aarhus? {number(meta.hours)} hours of open Energinet data, clustered and
+      refreshed every day.
+    </p>
+  </div>
+
+  <section class="container glance" aria-labelledby="glance-title">
+    <h2 id="glance-title" class="label">At a glance</h2>
+    <ul class="glance__list">
+      <li>
+        <strong class="mono">{number(meta.hours)}</strong>
+        <span>hours of DK1 and DK2 data from 5 open Energinet datasets, {date(meta.window.from)} to {date(meta.window.to)}</span>
+      </li>
+      <li>
+        <strong class="mono">{(inertiaChange * 100).toFixed(0)}%</strong>
+        <span>DK2 inertia in {names[last]!.toLowerCase()} against {names[0]!.toLowerCase()} ({windy.mean.inertia_dk2.toFixed(1)} vs {calm.mean.inertia_dk2.toFixed(1)} GWs)</span>
+      </li>
+      <li>
+        <strong class="mono">{model.baseline.auc.toFixed(2)} → {model.withRenewables.auc.toFixed(2)}</strong>
+        <span>AUC for flagging low-inertia hours, calendar only vs with wind and solar (average precision +{(apGain * 100).toFixed(0)}%)</span>
+      </li>
+      <li>
+        <strong class="mono">{pct(aarhusMedian)}</strong>
+        <span>median share of Aarhus's consumption covered by renewables produced in the municipality</span>
+      </li>
+    </ul>
+  </section>
+
+  <div class="container explorer">
+    <GridExplorer dataUrl={hoursUrl} meta={meta} names={names} />
+
+    <div class="types">
+      <table>
+        <caption>The hour types, in numbers (averages per type)</caption>
+        <thead>
+          <tr>
+            <th scope="col">Type</th>
+            <th scope="col">Hours</th>
+            <th scope="col">Wind + solar, DK1</th>
+            <th scope="col">DK2 inertia</th>
+            <th scope="col">Nordic inertia</th>
+            <th scope="col">Aarhus coverage</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            clusters.map((cluster, index) => (
+              <tr>
+                <th scope="row">
+                  <span class="dot" style={`background:var(--c${cluster.id})`}></span>
+                  {names[index]}
+                </th>
+                <td class="mono">{number(cluster.hours)}</td>
+                <td class="mono">{pct(cluster.mean.re_share_dk1)}</td>
+                <td class="mono">{cluster.mean.inertia_dk2.toFixed(1)} GWs</td>
+                <td class="mono">{cluster.mean.inertia_nordic.toFixed(0)} GWs</td>
+                <td class="mono">
+                  {cluster.local.median === null ? '—' : `${pct(cluster.local.median)} (${pct(cluster.local.p25!)}–${pct(cluster.local.p75!)})`}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <section class="container aarhus" aria-labelledby="aarhus-title">
+    <h2 id="aarhus-title" class="label">Aarhus</h2>
+    <p>
+      The data set gives, for every municipality and hour, the share of its consumption covered by
+      renewable energy produced there. For Aarhus the median is {pct(aarhusMedian)}. It follows the
+      national wind and solar share very little (correlation {localVsDk1.toFixed(2)} with DK1),
+      because it reflects local plants rather than the grid mix.
+    </p>
+    <div class="aarhus__charts">
+      <figure>
+        <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Median renewable coverage of Aarhus by hour of day. Highest at ${best('localByHour')[0]!.key}:00 (${pct(best('localByHour')[0]!.median!)}), lowest around ${best('localByHour').at(-1)!.key}:00 (${pct(best('localByHour').at(-1)!.median!)}).`}>
+          {ticks.map((v) => (
+            <g>
+              <line class="axis-line" x1={PAD.l} x2={W - PAD.r} y1={yOf(v)} y2={yOf(v)} />
+              <text class="axis-text" x={PAD.l - 6} y={yOf(v) + 4} text-anchor="end">{(v * 100).toFixed(0)}%</text>
+            </g>
+          ))}
+          {[0, 6, 12, 18, 23].map((h) => (
+            <text class="axis-text" x={PAD.l + (h / 23) * (W - PAD.l - PAD.r)} y={H - 6} text-anchor="middle">{h}:00</text>
+          ))}
+          <path class="series" d={hourPath} />
+        </svg>
+        <figcaption>By hour of the day (Danish time), median</figcaption>
+      </figure>
+      <figure>
+        <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Median renewable coverage of Aarhus by month. Highest in ${monthName(best('localByMonth')[0]!.key)} (${pct(best('localByMonth')[0]!.median!)}), lowest in ${monthName(best('localByMonth').at(-1)!.key)} (${pct(best('localByMonth').at(-1)!.median!)}).`}>
+          {ticks.map((v) => (
+            <g>
+              <line class="axis-line" x1={PAD.l} x2={W - PAD.r} y1={yOf(v)} y2={yOf(v)} />
+              <text class="axis-text" x={PAD.l - 6} y={yOf(v) + 4} text-anchor="end">{(v * 100).toFixed(0)}%</text>
+            </g>
+          ))}
+          {meta.localByMonth.map((p, i) => (
+            <g>
+              <rect class="bar" x={PAD.l + i * barWidth + 4} y={yOf(p.median ?? 0)} width={barWidth - 8} height={H - PAD.b - yOf(p.median ?? 0)} />
+              <text class="axis-text" x={PAD.l + i * barWidth + barWidth / 2} y={H - 6} text-anchor="middle">{monthName(p.key)}</text>
+            </g>
+          ))}
+        </svg>
+        <figcaption>By month, median (months are pooled across years)</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="container day" aria-labelledby="day-title">
+    <h2 id="day-title" class="label">Latest day with complete data</h2>
+    <p class="day__lead">
+      <strong>{date(day.date)}</strong>. The settlement data arrives 9–15 days late, so this is the
+      newest full day, not today.
+    </p>
+    <ul class="day__list">
+      <li>Lowest DK2 inertia: <strong class="mono">{day.lowestInertia.value.toFixed(1)} GWs</strong> at {time(day.lowestInertia.hour)}</li>
+      <li>Highest wind and solar share in DK1: <strong class="mono">{pct(day.highestRenewablesDK1.value)}</strong> at {time(day.highestRenewablesDK1.hour)}</li>
+      <li>Widest imbalance-price gap to spot: <strong class="mono">{day.widestImbalanceGap.value.toFixed(0)} EUR/MWh</strong> at {time(day.widestImbalanceGap.hour)}</li>
+      <li>
+        Hours by type: {clusters.map((cluster, index) => `${names[index]} ${day.clusterHours[String(cluster.id) as keyof typeof day.clusterHours] ?? 0}`).join(', ')}
+      </li>
+      <li>Aarhus coverage: {day.aarhusRenewableMedian === null ? 'not yet published for this day' : pct(day.aarhusRenewableMedian) + ' median'}</li>
+    </ul>
+  </section>
+
+  <section class="container reading" aria-labelledby="reading-title">
+    <h2 id="reading-title" class="label">Reading the data</h2>
+    <div class="reading__grid">
+      <div>
+        <h3>Question</h3>
+        <p>
+          What kinds of hour does the Danish power system have, how do wind and solar relate to
+          inertia and the cost of balancing, and how much of Aarhus's consumption do local
+          renewables cover?
+        </p>
+      </div>
+      <div>
+        <h3>Approach</h3>
+        <p>
+          Five open datasets from Energinet are joined into one hourly table: wind and solar share
+          of consumption (DK1 and DK2), inertia, frequency reserves bought, the gap between the
+          imbalance price and the spot price, and the renewable coverage of Aarhus. Hours are
+          rank-transformed, clustered with K-Means ({meta.k} clusters, picked by silhouette score)
+          and projected with PCA. A gradient-boosting model checks whether wind and solar help to
+          flag low-inertia hours, tested on the last {number(model.testHours)} hours.
+        </p>
+      </div>
+      <div class="reading__wide">
+        <h3>Result</h3>
+        <p>
+          In {names[last]!.toLowerCase()} DK2 inertia is {Math.abs(inertiaChange * 100).toFixed(0)}%
+          lower than in {names[0]!.toLowerCase()} ({windy.mean.inertia_dk2.toFixed(1)} against{' '}
+          {calm.mean.inertia_dk2.toFixed(1)} GWs), and Nordic inertia is{' '}
+          {Math.abs(nordicChange * 100).toFixed(0)}% lower. The link is real but modest: the
+          correlation between DK2 wind and solar share and DK2 inertia is {windVsInertia.toFixed(2)}.
+        </p>
+        <p>
+          Knowing the wind and solar share lifts the AUC for flagging low-inertia hours from{' '}
+          {model.baseline.auc.toFixed(2)} to {model.withRenewables.auc.toFixed(2)} and the average
+          precision from {model.baseline.average_precision.toFixed(2)} to{' '}
+          {model.withRenewables.average_precision.toFixed(2)} (chance is {model.chance.toFixed(2)}).
+          Aarhus's own renewable coverage has a median of {pct(aarhusMedian)} and does not follow
+          the national wind (correlation {localVsDk1.toFixed(2)}).
+        </p>
+      </div>
+      <div>
+        <h3>Limitations</h3>
+        <ul>
+          <li>
+            The hours form a continuum. The clusters are weakly separated (silhouette{' '}
+            {meta.silhouette[String(meta.k) as keyof typeof meta.silhouette]!.toFixed(2)}), so they
+            describe regimes rather than distinct kinds of hour.
+          </li>
+          <li>
+            Aarhus is in DK1. Inertia, reserves and imbalance prices describe the Nordic system
+            around DK2, so they do not act on Aarhus directly.
+          </li>
+          <li>
+            Aarhus reported exactly zero for long stretches. {number(meta.localExcludedHours)} hours
+            in runs of 24 hours or more were left out, as they look like outages or reporting
+            gaps. I cannot tell which from the data.
+          </li>
+          <li>
+            The model uses the realised wind and solar share, not a forecast, and a gain of{' '}
+            {model.aucGain.toFixed(2)} AUC is small.
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3>What I'd do next</h3>
+        <ul>
+          <li>Use day-ahead wind and solar forecasts, so the model could be used in advance.</li>
+          <li>Add the actual grid frequency, if a public series becomes available.</li>
+          <li>Compare Aarhus with other municipalities, and look into what drives the zero stretches.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="container origin" aria-labelledby="origin-title">
+    <h2 id="origin-title" class="label">Where the method comes from</h2>
+    <p>
+      At Endesa I built the daily frequency-event report for the Canary and Balearic systems and
+      used unsupervised clustering to find which kinds of event mattered for plant decisions. This
+      project applies the same ideas (an automated daily pipeline, correlations, clusters of
+      events) to public Danish data.
+    </p>
+  </section>
+
+  <section class="container method" aria-labelledby="method-title">
+    <h2 id="method-title" class="label">Data and code</h2>
+    <p>
+      Source: Energinet, Energi Data Service (open data):
+      inertia, FCR, imbalance price, production and consumption settlement, and renewable coverage
+      per municipality. Aarhus is municipality 751. A Python pipeline downloads the data, builds the
+      hourly table and writes two JSON files; a scheduled GitHub Actions job reruns it every day.
+      The page was last built from data generated on {date(meta.generatedAt)}.{' '}
+      <a href="https://github.com/DaniGV63/DaniGV63.github.io/tree/main/pipeline/energinet" rel="noopener">Pipeline code on GitHub ↗</a>
+    </p>
+  </section>
+
+  <div class="container back"><a href="/">← Back to the home page</a></div>
+
+  <Fragment slot="legal">
+    Data from Energinet's Energi Data Service (open data). This is an unofficial,
+    non-commercial project and is not associated with Energinet. The Energinet name and
+    logo are trademarks of their owner.
+  </Fragment>
+</BaseLayout>
+
+<style>
+  .brand-logo {
+    display: block;
+    height: 1.4rem;
+    width: calc(1.4rem * 7.88);
+    max-width: 100%;
+    background: currentColor;
+    color: var(--color-text);
+    -webkit-mask: url('/energinet.svg') no-repeat left center / contain;
+    mask: url('/energinet.svg') no-repeat left center / contain;
+  }
+
+  .intro {
+    display: grid;
+    gap: var(--space-3);
+    padding-block: var(--space-12) var(--space-6);
+  }
+
+  .intro__lead {
+    color: var(--color-text-muted);
+    max-width: var(--measure);
+  }
+
+  .glance,
+  .aarhus,
+  .day,
+  .reading,
+  .origin,
+  .method {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-12);
+  }
+
+  .glance__list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .glance__list li {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .glance__list strong {
+    font-size: var(--step-3);
+    line-height: 1.1;
+    color: var(--color-accent);
+  }
+
+  .glance__list span {
+    color: var(--color-text-muted);
+    font-size: var(--step--1);
+  }
+
+  .explorer {
+    margin-top: var(--space-8);
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .types {
+    overflow-x: auto;
+  }
+
+  .types table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+  }
+
+  .types caption {
+    text-align: left;
+    padding-bottom: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .types th,
+  .types td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: var(--space-2);
+    border-radius: 50%;
+  }
+
+  .aarhus p,
+  .day__lead,
+  .origin p,
+  .method p {
+    max-width: var(--measure);
+  }
+
+  .aarhus__charts {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .aarhus figure {
+    min-width: 0;
+  }
+
+  .aarhus svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .aarhus figcaption {
+    margin-top: var(--space-2);
+    font-size: var(--step--1);
+    color: var(--color-text-muted);
+  }
+
+  .axis-line {
+    stroke: var(--color-border);
+  }
+
+  .axis-text {
+    fill: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+  }
+
+  .series {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+
+  .bar {
+    fill: var(--color-accent);
+  }
+
+  .day__list {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .reading__grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .reading h3 {
+    margin-bottom: var(--space-2);
+    font-size: var(--step-0);
+  }
+
+  .reading ul {
+    display: grid;
+    gap: var(--space-2);
+    padding-left: var(--space-4);
+    list-style: disc;
+  }
+
+  .reading p + p {
+    margin-top: var(--space-3);
+  }
+
+  .back {
+    margin-top: var(--space-12);
+  }
+
+  @media (min-width: 720px) {
+    .glance__list {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .aarhus__charts,
+    .reading__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .reading__wide {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

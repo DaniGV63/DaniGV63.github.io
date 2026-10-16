@@ -97,6 +97,19 @@
       "featured": true
     },
     {
+      "id": "danish-grid",
+      "title": "Danish Power System: what kinds of hour?",
+      "summary": "Open Energinet data refreshed daily: hours of the Danish grid clustered into types, how wind and solar relate to inertia, and how much of Aarhus's consumption local renewables cover.",
+      "href": "/projects/danish-grid/",
+      "tags": [
+        "Python",
+        "scikit-learn",
+        "D3.js",
+        "GitHub Actions"
+      ],
+      "featured": true
+    },
+    {
       "id": "botllm",
       "title": "BotLLM — AI appointment bot",
       "summary": "WhatsApp appointment-management bot with its own website for a physiotherapy clinic, built end to end.",

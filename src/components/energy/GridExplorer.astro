@@ -1,0 +1,224 @@
+---
+// Interactive scatter of every hour (canvas, drawn by src/scripts/energy/explorer.ts).
+// The hourly data loads on demand; the summary table below it is static HTML.
+interface Props {
+  dataUrl: string;
+  meta: {
+    features: Record<string, { label: string; unit: string; scale: number }>;
+    clusters: { id: number; label: string; hours: number; share: number }[];
+  };
+  names: string[];
+}
+
+const { dataUrl, meta, names } = Astro.props;
+const axes = Object.entries(meta.features);
+const payload = JSON.stringify({
+  features: meta.features,
+  clusters: meta.clusters.map((cluster, index) => ({ id: cluster.id, name: names[index] })),
+}).replace(
+  /</g,
+  '\\u003c',
+);
+---
+
+<section class="grid" aria-labelledby="grid-title">
+  <script type="application/json" id="grid-meta" set:html={payload} is:inline />
+
+  <div class="grid__bar">
+    <div>
+      <h2 id="grid-title" class="grid__title">Every hour of the Danish power system</h2>
+      <p class="grid__hint">
+        Each dot is one hour. Colours are the hour types found by clustering. Click a type to
+        isolate it, hover a dot for the hour.
+      </p>
+    </div>
+    <div class="grid__fields">
+      <label>
+        <span>Horizontal</span>
+        <select id="grid-x">
+          {
+            axes.map(([key, info]) => (
+              <option value={key} selected={key === 're_share_dk1'}>{info.label}</option>
+            ))
+          }
+        </select>
+      </label>
+      <label>
+        <span>Vertical</span>
+        <select id="grid-y">
+          {
+            axes.map(([key, info]) => (
+              <option value={key} selected={key === 'inertia_dk2'}>{info.label}</option>
+            ))
+          }
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <ul class="grid__legend" aria-label="Hour types">
+    {
+      meta.clusters.map((cluster, index) => (
+        <li>
+          <button type="button" data-cluster={cluster.id} aria-pressed="true">
+            <span class="swatch" style={`background:var(--c${cluster.id})`}></span>
+            <strong>{names[index]}</strong>
+            <span class="grid__count">{(cluster.share * 100).toFixed(0)}% of hours</span>
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="grid__plot">
+    <canvas
+      id="grid-canvas"
+      data-src={dataUrl}
+      role="img"
+      aria-label="Scatter plot of every hour, coloured by hour type. The table below summarises each type."
+    ></canvas>
+    <p id="grid-status" class="grid__status">Loading hourly data…</p>
+    <div id="grid-tooltip" class="grid__tooltip" hidden></div>
+  </div>
+  <p id="grid-note" class="grid__hint" aria-live="polite"></p>
+</section>
+
+<style is:global>
+  .grid {
+    --c0: #56b4e9;
+    --c1: #e69f00;
+    --c2: #cc79a7;
+    --c3: #009e73;
+    --c4: #0072b2;
+    --c5: #d55e00;
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .grid__bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .grid__title {
+    font-size: var(--step-1);
+  }
+
+  .grid__hint {
+    color: var(--color-text-muted);
+    font-size: var(--step--1);
+  }
+
+  .grid__fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .grid__fields label {
+    display: grid;
+    gap: 2px;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .grid__fields select {
+    font: inherit;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-1) var(--space-2);
+    max-width: 100%;
+  }
+
+  .grid__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .grid__legend button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font: inherit;
+    font-size: var(--step--1);
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-1) var(--space-3);
+    cursor: pointer;
+    opacity: 0.55;
+  }
+
+  .grid__legend button[aria-pressed='true'] {
+    opacity: 1;
+    border-color: var(--color-text-muted);
+  }
+
+  .grid__count {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .grid__plot {
+    position: relative;
+  }
+
+  #grid-canvas {
+    display: block;
+    width: 100%;
+    height: clamp(280px, 55vw, 440px);
+    touch-action: manipulation;
+  }
+
+  .grid__status[hidden] {
+    display: none;
+  }
+
+  .grid__status {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--color-text-muted);
+  }
+
+  .grid__tooltip {
+    position: absolute;
+    z-index: 2;
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    white-space: pre;
+    pointer-events: none;
+  }
+
+  @media (min-width: 900px) {
+    .grid {
+      padding: var(--space-6);
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/energy/explorer';
+</script>

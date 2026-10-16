@@ -2,14 +2,17 @@
 interface Props {
   id: string;
   title: string;
+  /** Optional one-line introduction under the title. */
+  lead?: string;
 }
 
-const { id, title } = Astro.props;
+const { id, title, lead } = Astro.props;
 ---
 
 <section id={id} aria-labelledby={`${id}-title`} class="section">
   <div class="container">
     <h2 id={`${id}-title`} class="section__title label">{title}</h2>
+    {lead && <p class="section__lead">{lead}</p>}
     <slot />
   </div>
 </section>
@@ -19,8 +22,14 @@ const { id, title } = Astro.props;
     margin-top: var(--space-16);
   }
 
-  .section__title {
+  .section__lead {
+    max-width: var(--measure);
     margin-bottom: var(--space-6);
+    color: var(--color-text-muted);
+  }
+
+  .section__title {
+    margin-bottom: var(--space-4);
     padding-bottom: var(--space-3);
     border-bottom: 1px solid var(--color-border);
     font-weight: 500;

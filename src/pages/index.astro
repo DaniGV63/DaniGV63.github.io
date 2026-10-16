@@ -8,11 +8,15 @@ import ExperienceItem from '../components/ExperienceItem.astro';
 import F1Banner from '../components/F1Banner.astro';
 import BotBanner from '../components/BotBanner.astro';
 import EmgBanner from '../components/EmgBanner.astro';
+import GridBanner from '../components/GridBanner.astro';
 import TagList from '../components/TagList.astro';
 import profile from '../data/profile.json';
 
 const featuredProject = profile.projects.find((p) => p.featured && p.id === 'f1-race-analysis');
-const otherProjects = profile.projects.filter((p) => p.id !== featuredProject?.id);
+const gridProject = profile.projects.find((p) => p.id === 'danish-grid');
+const otherProjects = profile.projects.filter(
+  (p) => p.id !== featuredProject?.id && p.id !== gridProject?.id,
+);
 const banners: Record<string, string> = { botllm: '#19c3a6', 'mdpi-emg': '#a78bfa' };
 ---
 
@@ -23,7 +27,11 @@ const banners: Record<string, string> = { botllm: '#19c3a6', 'mdpi-emg': '#a78bf
     <StrengthGrid items={profile.strengths} />
   </Section>
 
-  <Section id="work" title="Selected work">
+  <Section
+    id="work"
+    title="Selected work"
+    lead="Side projects and research I built to show how I work with data: pipelines, analysis and interactive charts."
+  >
     <div class="work">
       {
         featuredProject && (
@@ -33,10 +41,28 @@ const banners: Record<string, string> = { botllm: '#19c3a6', 'mdpi-emg': '#a78bf
             href={featuredProject.href}
             tags={featuredProject.tags}
             status={featuredProject.status}
+            status="Side project"
             featured
             banner
           >
             <F1Banner slot="banner" />
+          </ProjectCard>
+        )
+      }
+      {
+        gridProject && (
+          <ProjectCard
+            title={gridProject.title}
+            summary={gridProject.summary}
+            href={gridProject.href}
+            tags={gridProject.tags}
+            status="Side project"
+            featured
+            banner
+            accent="#f0a30a"
+            logo="/energinet.svg"
+          >
+            <GridBanner slot="banner" />
           </ProjectCard>
         )
       }
@@ -48,6 +74,7 @@ const banners: Record<string, string> = { botllm: '#19c3a6', 'mdpi-emg': '#a78bf
               summary={project.summary}
               href={project.href}
               tags={project.tags}
+              status={project.id === 'botllm' ? 'Side project' : undefined}
               banner={project.id in banners}
               accent={banners[project.id]}
             >
