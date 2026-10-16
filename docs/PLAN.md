@@ -32,7 +32,7 @@ Marcar con [x] al terminar. Cada fase acaba con `npm run build` sin errores y un
 - [ ] Añadir el enlace al CV, a LinkedIn (Featured) y al perfil de GitHub.
 
 ## Más adelante
-- [ ] Proyecto "Danish electricity" (Energinet): pipeline programado + análisis de series temporales.
+- [x] Proyecto "Danish Power System" (Energinet, con Aarhus): pipeline programado, clusters y modelo, página interactiva (ver docs/SESIONES.md).
 - [ ] Dominio propio (opcional, ~10 €/año).
 
 ## Decisiones abiertas (preguntar a Dani)

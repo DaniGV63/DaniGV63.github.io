@@ -12,3 +12,8 @@ Notas:
 - Los logos de equipo vienen con una tesela blanca de esquinas redondeadas (así los publica F1); sobre fondos oscuros se muestran sobre blanco.
 - Slugs del CDN: `red-bull-racing`, `mercedes`, `ferrari`, `alphatauri`, `mclaren`, `alpine`, `aston-martin`, `williams`, `alfa-romeo-racing`, `haas-f1-team`.
 - Para otra temporada, cambiar `2021` en la URL y comprobar que el slug existe.
+
+
+## Energinet
+
+`public/energinet.svg`: Wikimedia Commons, `File:Energinet logo.svg` (dominio público, marca registrada), descargado el 2026-10-17. Se pinta con una máscara CSS en blanco (tarjeta de la home) o en el color del texto (página Danish Power System). La página mantiene el aviso de proyecto no oficial en el pie.

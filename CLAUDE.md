@@ -30,7 +30,7 @@ Web portfolio personal de **Daniel (Dani) Gómez Verde**, Data & AI Engineer y e
 3. **Experiencia como casos de estudio**: Mática Partners y Endesa (página propia cada uno o una página "Experience").
 4. **BotLLM** (full-stack, enlace a GitHub) y **paper MDPI** (investigación).
 
-Fuera de v1 (más adelante): proyecto "Danish electricity" con datos de Energinet. Ver `docs/PLAN.md`.
+5. **Danish Power System** (datos abiertos de Energinet, con la región de Aarhus): pipeline en `pipeline/energinet/`, actualización diaria con GitHub Actions (`refresh-energinet.yml`). Aplica a datos públicos el método de Endesa. No se usa nada de la carpeta `FUSE/` (interna, ignorada por git).
 
 ## 4. Reglas de contenido (MUY IMPORTANTES)
 

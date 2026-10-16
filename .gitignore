@@ -34,3 +34,9 @@ Thumbs.db
 
 # Personal originals (CV with private data, raw photo)
 /cv_dani/
+
+# Endesa internal work: never commit
+/FUSE/
+
+# Raw Energinet downloads (re-created by the pipeline)
+/pipeline/energinet/.cache/

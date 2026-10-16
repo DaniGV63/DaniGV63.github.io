@@ -56,3 +56,30 @@ Entre los 14 pilotos que terminaron, Hamilton ganó el 22 % de las partes que di
 - Certificaciones y Private Tutor no están en la home.
 - Revisar el aviso sobre marcas registradas (logos de F1 y equipos) en el repo público.
 - Más adelante: proyecto "Danish electricity" (Energinet) y dominio propio.
+
+## Sesión del 16 de octubre de 2026 (tarde): Danish Power System
+
+### Qué se hizo
+- Banners para las tarjetas de BotLLM y del paper EMG (`BotBanner`, `EmgBanner`), publicados.
+- Nuevo proyecto **Danish Power System** (datos abiertos de Energinet + Aarhus), que aplica a datos públicos el método de Endesa:
+  - `pipeline/energinet/`: descarga con reintentos (la API limita el ritmo), tabla horaria de DK2, clustering (PCA + K-Means con silhouette), horas atípicas y un modelo que detecta horas de inercia baja respecto a los 30 días previos. 22 tests en `pipeline/tests/`.
+  - `src/data/energinet/`: `meta.json` y `hours.json` generados.
+  - Página `/projects/danish-grid/` con gráfico interactivo (canvas + D3), tabla de tipos de hora, gráficos de Aarhus, informe del último día completo y sección sobre Endesa.
+  - Tarjeta con banner en la home y entrada en `profile.json`.
+  - Workflow `.github/workflows/refresh-energinet.yml`: actualización diaria gratuita y despliegue explícito.
+- `FUSE/` (trabajo interno de Endesa) añadida a `.gitignore`; no se ha copiado nada de ahí.
+
+### Resultados (cifras reales)
+- 13 841 horas; 3 tipos de hora, separación débil (silhouette 0,22).
+- Inercia de DK2 un 20 % menor en horas de mucho viento y sol (5,6 vs 6,9 GWs).
+- Modelo de inercia baja: AUC 0,757 → 0,776 al añadir viento y sol (precisión media +11 %; azar 0,12).
+- Aarhus: mediana de cobertura renovable local del 11 %, sin relación con el viento nacional (r ≈ −0,07).
+
+### Decisiones y límites
+- Aarhus está en DK1; la inercia y las reservas son del sistema nórdico (DK2). Se explica en la página.
+- Los tramos de ≥ 24 h en cero de Aarhus se excluyen (1 435 h); causa desconocida.
+- Primer modelo con umbral fijo falló (AUC 0,45) por un cambio de nivel de la inercia en 2026; se rehízo con umbral relativo.
+
+### Qué falta
+- Probar el workflow diario en GitHub (no se puede probar en local) y revisar el primer commit automático.
+- Fase 3: caso de estudio de Mática; Fase 4: Lighthouse, Open Graph, sitemap.
