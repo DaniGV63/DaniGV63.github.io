@@ -1,6 +1,6 @@
 ---
-// Interactive explorer: sector times per lap (left) linked to the circuit map
-// (right). Logic lives in src/scripts/f1/. D3 is bundled only into this page.
+// Race pace: lap time or race gap per lap with tyre strips. Logic lives in
+// src/scripts/f1/. Also owns the #f1-data payload that LapComparison reads.
 import type { LapRow, RaceMeta, TrackData } from '../../scripts/f1/types';
 
 interface Props {
@@ -14,50 +14,50 @@ const { folder, meta, laps, track } = Astro.props;
 const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u003c');
 ---
 
-<section class="f1" id="f1-explorer" aria-label="Interactive race explorer">
+<section class="f1" id="f1-explorer" aria-labelledby="pace-title">
   <script type="application/json" id="f1-data" set:html={payload} is:inline />
 
   <div class="f1__bar">
     <div>
-      <p class="f1__kicker">Sector times by lap</p>
-      <p class="f1__hint">Sector times by lap, for the drivers selected above. Click a line to pick a lap. ← → change lap.</p>
+      <p class="f1__kicker" id="pace-title">Race pace</p>
+      <p class="f1__hint">
+        How the race unfolded for the drivers selected above. Dots mark a new set of tyres, filled
+        with its compound. Click a lap for its sector times · ← → change lap.
+      </p>
     </div>
     <label class="f1__field">
-      <span>Y axis</span>
-      <select id="f1-ymode">
-        <option value="delta">Time lost vs best</option>
-        <option value="raw">Sector time</option>
+      <span>View</span>
+      <select id="pace-view">
+        <option value="lap">Lap time</option>
+        <option value="gap">Race gap</option>
       </select>
     </label>
   </div>
 
-  <div class="f1__lapbar">
-    <button type="button" id="f1-prev" aria-label="Previous lap">‹</button>
-    <input id="f1-lap" type="range" min="1" max="58" value="1" aria-label="Lap number" />
-    <button type="button" id="f1-next" aria-label="Next lap">›</button>
-    <output id="f1-lap-out" class="mono" for="f1-lap">Lap 1</output>
-  </div>
+  <ul class="pace-legend pace-drivers" id="pace-drivers" aria-label="Selected drivers"></ul>
 
-  <div class="f1__views">
-    <div class="f1__view">
-      <h3 class="f1__title">Sector times by lap</h3>
-      <div class="f1__chart" id="f1-laps-chart"></div>
-      <div class="f1__tooltip" id="f1-tooltip" hidden></div>
+  <ul class="pace-legend" aria-label="Tyre compounds and markers">
+    <li><span class="dot" style="background:#e10600"></span>Soft</li>
+    <li><span class="dot" style="background:#f5c518"></span>Medium</li>
+    <li><span class="dot" style="background:#d4d4d8"></span>Hard</li>
+    <li><span class="pace-legend__sc"></span>Safety car</li>
+  </ul>
+
+  <div class="f1__view">
+    <div
+      class="f1__chart"
+      id="pace-chart"
+      tabindex="0"
+      role="group"
+      aria-label="Race pace chart. Use the left and right arrow keys to change lap."
+    >
     </div>
-    <div class="f1__view">
-      <h3 class="f1__title">Track · <span id="f1-map-title">—</span></h3>
-      <div class="f1__map" id="f1-track-map"></div>
-      <ul class="f1__legend" aria-label="Sector colours">
-        <li><span style="background:#e10600"></span>S1</li>
-        <li><span style="background:#f5c518"></span>S2</li>
-        <li><span style="background:#3b82f6"></span>S3</li>
-      </ul>
-    </div>
+    <div class="f1__tooltip" id="pace-tooltip" hidden></div>
   </div>
 
   <div class="f1__tablewrap">
     <table class="f1__table">
-      <caption>Selected lap, selected drivers (best sector highlighted)</caption>
+      <caption id="pace-caption">Click a lap in the chart to see its sector times.</caption>
       <thead>
         <tr>
           <th scope="col">Driver</th>
@@ -68,7 +68,7 @@ const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u
           <th scope="col">Tyre</th>
         </tr>
       </thead>
-      <tbody id="f1-table-body"></tbody>
+      <tbody id="pace-table-body"></tbody>
     </table>
   </div>
 </section>
@@ -355,6 +355,78 @@ const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u
     font-weight: 700;
   }
 
+  .pace-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--f1-muted);
+  }
+
+  .pace-legend span {
+    display: inline-block;
+    width: 12px;
+    height: 8px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .pace-legend__sc {
+    background: var(--pace-sc);
+  }
+
+  .pace-drivers span {
+    width: 14px;
+    height: 14px;
+    margin-right: 6px;
+    border-radius: 4px;
+  }
+
+  .pace-legend .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .f1 {
+    --pace-sc: light-dark(rgb(20 23 26 / 0.1), rgb(255 255 255 / 0.12));
+  }
+
+  .pace-sc {
+    fill: var(--pace-sc);
+  }
+
+  .pace-line {
+    fill: none;
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .pace-dot {
+    stroke-width: 2;
+  }
+
+  .pace-zero {
+    stroke: var(--f1-muted);
+    stroke-dasharray: 2 3;
+  }
+
+  .pace-selected {
+    stroke: var(--f1-ink);
+    stroke-width: 1.5;
+  }
+
+  .pace-hit {
+    fill: transparent;
+    cursor: pointer;
+  }
+
+  #pace-chart:focus-visible {
+    outline: 2px solid var(--color-focus, currentColor);
+    outline-offset: 2px;
+  }
+
   @media (min-width: 900px) {
     .f1 {
       padding: var(--space-6);
@@ -367,5 +439,5 @@ const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u
 </style>
 
 <script>
-  import '../../scripts/f1/explorer';
+  import '../../scripts/f1/pace';
 </script>
