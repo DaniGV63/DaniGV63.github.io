@@ -14,11 +14,11 @@ Marcar con [x] al terminar. Cada fase acaba con `npm run build` sin errores y un
 - [x] CV en PDF en `public/cv/` (versión pública sin teléfono, dirección ni edad).
 
 ## Fase 2 — Proyecto estrella: F1
-- [ ] Confirmar la spec con la visualización de referencia (`docs/F1_SPEC.md` §6).
-- [x] Pipeline Python + tests + JSON generados (Abu Dabi 2021, 1.27 MB). Falta commitear.
-- [ ] Vista A + Vista B enlazadas en D3.
-- [ ] Texto del análisis (pregunta, método, resultado, limitaciones) + aviso legal.
-- [ ] Revisión móvil y accesibilidad.
+- [x] Spec confirmada por iteraciones con Dani: Abu Dabi 2021, pregunta general sobre todos los pilotos (`docs/F1_SPEC.md`).
+- [x] Pipeline Python + tests + JSON generados y commiteados (Abu Dabi 2021, 1.4 MB).
+- [x] Vistas enlazadas en D3: explorador de sectores y comparación vuelta a vuelta con circuito 2D/3D.
+- [x] Texto del análisis (pregunta, método, resultado, limitaciones) + aviso legal.
+- [x] Revisión a 375 px y escritorio, teclado y alternativa textual (Lighthouse queda para la Fase 4).
 
 ## Fase 3 — Experiencia y resto de proyectos
 - [ ] Caso de estudio Mática Partners.
