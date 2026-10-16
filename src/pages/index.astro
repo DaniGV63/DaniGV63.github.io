@@ -6,11 +6,14 @@ import StrengthGrid from '../components/StrengthGrid.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
 import F1Banner from '../components/F1Banner.astro';
+import BotBanner from '../components/BotBanner.astro';
+import EmgBanner from '../components/EmgBanner.astro';
 import TagList from '../components/TagList.astro';
 import profile from '../data/profile.json';
 
 const featuredProject = profile.projects.find((p) => p.featured && p.id === 'f1-race-analysis');
 const otherProjects = profile.projects.filter((p) => p.id !== featuredProject?.id);
+const banners: Record<string, string> = { botllm: '#19c3a6', 'mdpi-emg': '#a78bfa' };
 ---
 
 <BaseLayout>
@@ -45,7 +48,12 @@ const otherProjects = profile.projects.filter((p) => p.id !== featuredProject?.i
               summary={project.summary}
               href={project.href}
               tags={project.tags}
-            />
+              banner={project.id in banners}
+              accent={banners[project.id]}
+            >
+              {project.id === 'botllm' && <BotBanner slot="banner" />}
+              {project.id === 'mdpi-emg' && <EmgBanner slot="banner" />}
+            </ProjectCard>
           ))
         }
       </div>

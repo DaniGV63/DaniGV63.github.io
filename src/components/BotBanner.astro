@@ -1,0 +1,181 @@
+---
+// Decorative banner for the BotLLM card: a chat that ends in a booked slot.
+// Purely illustrative shapes, no real conversation or client data.
+const W = 600;
+const H = 240;
+const columns = Array.from({ length: 7 }, (_, i) => 240 + i * 60);
+const rows = Array.from({ length: 5 }, (_, i) => 40 + i * 40);
+---
+
+<div class="banner" aria-hidden="true">
+  <svg class="banner__svg" viewBox={`232 0 ${W - 232} ${H}`} preserveAspectRatio="xMidYMid meet">
+    <g class="grid">
+      {columns.map((x) => <line x1={x} y1="0" x2={x} y2={H} />)}
+      {rows.map((y) => <line x1="240" y1={y} x2={W} y2={y} />)}
+    </g>
+
+    <g class="item item--1">
+      <rect class="bubble bubble--in" x="250" y="26" width="196" height="46" rx="14" />
+      <rect class="line" x="268" y="40" width="132" height="6" rx="3" />
+      <rect class="line" x="268" y="54" width="84" height="6" rx="3" />
+    </g>
+
+    <g class="item item--2">
+      <rect class="bubble bubble--out" x="364" y="84" width="206" height="46" rx="14" />
+      <rect class="line line--out" x="382" y="98" width="150" height="6" rx="3" />
+      <rect class="line line--out" x="382" y="112" width="96" height="6" rx="3" />
+    </g>
+
+    <g class="item item--3">
+      <rect class="bubble bubble--in" x="250" y="142" width="74" height="34" rx="14" />
+      <circle class="dot dot--1" cx="272" cy="159" r="4" />
+      <circle class="dot dot--2" cx="287" cy="159" r="4" />
+      <circle class="dot dot--3" cx="302" cy="159" r="4" />
+    </g>
+
+    <g class="item item--4">
+      <rect class="slot" x="370" y="150" width="200" height="68" rx="10" />
+      <rect class="slot__head" x="370" y="150" width="200" height="16" rx="10" />
+      <rect class="line" x="386" y="180" width="96" height="6" rx="3" />
+      <rect class="line" x="386" y="195" width="62" height="6" rx="3" />
+      <circle class="tick" cx="540" cy="192" r="14" />
+      <path class="tick__mark" d="m533 192 5 5 9-10" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .banner {
+    --accent: #19c3a6;
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 10rem;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      radial-gradient(70% 120% at 50% 50%, rgb(25 195 166 / 0.2), transparent 55%),
+      linear-gradient(100deg, #0b0b0f 25%, #14141b 100%);
+  }
+
+  .banner__svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .grid line {
+    stroke: #fff;
+    stroke-opacity: 0.06;
+  }
+
+  .bubble--in {
+    fill: #2a2a35;
+  }
+
+  .bubble--out {
+    fill: rgb(25 195 166 / 0.22);
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+
+  .line {
+    fill: #6b6b7a;
+  }
+
+  .line--out {
+    fill: var(--accent);
+    opacity: 0.8;
+  }
+
+  .dot {
+    fill: #9a9aa8;
+  }
+
+  .slot {
+    fill: #14141b;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+  }
+
+  .slot__head {
+    fill: var(--accent);
+    opacity: 0.35;
+  }
+
+  .tick {
+    fill: var(--accent);
+  }
+
+  .tick__mark {
+    fill: none;
+    stroke: #0b0b0f;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .item {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  :global(.card--banner:hover) .item {
+    animation: pop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  :global(.card--banner:hover) .item--2 {
+    animation-delay: 0.55s;
+  }
+
+  :global(.card--banner:hover) .item--3 {
+    animation-delay: 1.1s;
+  }
+
+  :global(.card--banner:hover) .item--4 {
+    animation-delay: 1.7s;
+  }
+
+  :global(.card--banner:hover) .dot {
+    animation: bounce 0.9s ease-in-out infinite 1.1s;
+  }
+
+  :global(.card--banner:hover) .dot--2 {
+    animation-delay: 1.25s;
+  }
+
+  :global(.card--banner:hover) .dot--3 {
+    animation-delay: 1.4s;
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.94);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-4px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.card--banner:hover) .item,
+    :global(.card--banner:hover) .dot {
+      animation: none;
+    }
+  }
+</style>

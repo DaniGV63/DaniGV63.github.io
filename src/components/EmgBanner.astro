@@ -1,0 +1,147 @@
+---
+// Decorative banner for the EMG paper card: signal traces, a spectrogram and the
+// classifier result. The signals are synthetic shapes, not data from the paper;
+// only the 90% and 85% figures come from the abstract.
+const W = 600;
+const H = 240;
+
+let seed = 7;
+const random = (): number => {
+  seed = (seed * 16807) % 2147483647;
+  return seed / 2147483647;
+};
+
+// Noisy trace with a burst of activity, like a muscle contraction.
+function trace(y: number, burstAt: number, amplitude: number): string {
+  const points: string[] = [];
+  for (let x = 250; x <= 590; x += 4) {
+    const burst = Math.exp(-(((x - burstAt) / 55) ** 2));
+    const wiggle = (random() - 0.5) * (4 + amplitude * burst);
+    points.push(`${x},${(y + wiggle).toFixed(1)}`);
+  }
+  return `M${points.join('L')}`;
+}
+
+const traces = [trace(38, 380, 26), trace(80, 430, 34), trace(122, 350, 22)];
+
+const cols = 17;
+const rows = 4;
+const cells = Array.from({ length: cols * rows }, (_, i) => {
+  const c = i % cols;
+  const r = Math.floor(i / cols);
+  const burst = Math.exp(-(((c - 8) / 3.5) ** 2)) * (1 - r * 0.18);
+  return { c, r, level: Math.min(1, 0.12 + burst + random() * 0.18) };
+});
+---
+
+<div class="banner" aria-hidden="true">
+  <svg class="banner__svg" viewBox={`232 0 ${W - 232} ${H}`} preserveAspectRatio="xMidYMid meet">
+    <g class="traces">
+      {traces.map((d) => <path d={d} />)}
+    </g>
+
+    <g class="spec">
+      {
+        cells.map(({ c, r, level }) => (
+          <rect x={250 + c * 14} y={152 + r * 16} width="12" height="13" rx="2" opacity={level} />
+        ))
+      }
+    </g>
+
+    <rect class="scan" x="250" y="14" width="3" height="206" rx="1.5" />
+
+    <g class="result">
+      <rect x="500" y="150" width="90" height="66" rx="10" />
+      <text x="545" y="186" text-anchor="middle" class="result__big">90%</text>
+      <text x="545" y="204" text-anchor="middle" class="result__small">vs 85% benchmark</text>
+    </g>
+  </svg>
+</div>
+
+<style>
+  .banner {
+    --accent: #a78bfa;
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 10rem;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      radial-gradient(70% 120% at 50% 50%, rgb(167 139 250 / 0.2), transparent 55%),
+      linear-gradient(100deg, #0b0b0f 25%, #14141b 100%);
+  }
+
+  .banner__svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .traces path {
+    fill: none;
+    stroke: #6b6b7a;
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    transition: stroke 0.3s;
+  }
+
+  :global(.card--banner:hover) .traces path {
+    stroke: var(--accent);
+  }
+
+  .spec rect {
+    fill: var(--accent);
+  }
+
+  .scan {
+    fill: #e8e8f0;
+    opacity: 0;
+    filter: drop-shadow(0 0 4px var(--accent));
+  }
+
+  .result rect {
+    fill: #14141b;
+    stroke: #3a3a46;
+    stroke-width: 1.5;
+    transition: stroke 0.3s;
+  }
+
+  .result__big {
+    fill: #fff;
+    font: 700 22px 'Inter Variable', system-ui, sans-serif;
+  }
+
+  .result__small {
+    fill: #9a9aa8;
+    font: 500 8px 'JetBrains Mono Variable', ui-monospace, monospace;
+  }
+
+  :global(.card--banner:hover) .result rect {
+    stroke: var(--accent);
+  }
+
+  :global(.card--banner:hover) .scan {
+    opacity: 1;
+    animation: scan 2.4s linear infinite;
+  }
+
+  @keyframes scan {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(336px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.card--banner:hover) .scan {
+      animation: none;
+      transform: translateX(150px);
+    }
+  }
+</style>

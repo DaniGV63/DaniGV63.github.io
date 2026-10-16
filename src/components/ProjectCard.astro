@@ -11,15 +11,20 @@ interface Props {
   featured?: boolean;
   /** Dark banner variant; pass the artwork through the `banner` slot. */
   banner?: boolean;
+  /** Accent colour of the banner variant (defaults to F1 red). */
+  accent?: string;
 }
 
-const { title, summary, href, tags, status, featured = false, banner = false } = Astro.props;
+const { title, summary, href, tags, status, featured = false, banner = false, accent } = Astro.props;
 const external = isExternal(href);
 // Banner cards show the F1 symbol in place of a leading "F1".
 const symbolTitle = banner && title.startsWith('F1 ') ? title.slice(3) : null;
 ---
 
-<article class:list={['card', { 'card--featured': featured, 'card--banner': banner }]}>
+<article
+  class:list={['card', { 'card--featured': featured, 'card--banner': banner }]}
+  style={accent ? `--banner-accent:${accent}` : undefined}
+>
   {banner && <slot name="banner" />}
   <div class="card__head">
     <h3 class="card__title">
@@ -141,16 +146,22 @@ const symbolTitle = banner && title.startsWith('F1 ') ? title.slice(3) : null;
     isolation: isolate;
     background: #0b0b0f;
     border-color: #2a2a35;
-    border-top: 3px solid #e10600;
+    border-top: 3px solid var(--banner-accent, #e10600);
     color: #f5f5f7;
     transition:
       border-color 0.3s,
       box-shadow 0.3s;
   }
 
+  /* Compact banner cards: artwork on top, text below. */
+  .card--banner:not(.card--featured) {
+    min-height: 0;
+    padding-top: calc(10rem + var(--space-3));
+  }
+
   .card--banner:hover {
-    border-color: #e10600;
-    box-shadow: 0 0 0 1px rgb(225 6 0 / 0.5);
+    border-color: var(--banner-accent, #e10600);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--banner-accent, #e10600) 50%, transparent);
   }
 
   .card--banner .card__link {
@@ -183,8 +194,8 @@ const symbolTitle = banner && title.startsWith('F1 ') ? title.slice(3) : null;
 
   .card--banner .card__status {
     color: #fff;
-    border-color: #e10600;
-    background: rgb(225 6 0 / 0.25);
+    border-color: var(--banner-accent, #e10600);
+    background: color-mix(in srgb, var(--banner-accent, #e10600) 25%, transparent);
   }
 
   .card--banner :global(.tags__item) {
