@@ -6,9 +6,11 @@ interface Props {
   location: string;
   context: string;
   highlights: readonly string[];
+  /** Optional link to a public project that shows the same kind of work. */
+  related?: { href: string; label: string };
 }
 
-const { role, company, period, location, context, highlights } = Astro.props;
+const { role, company, period, location, context, highlights, related } = Astro.props;
 ---
 
 <article class="experience">
@@ -22,6 +24,7 @@ const { role, company, period, location, context, highlights } = Astro.props;
   <ul class="experience__list">
     {highlights.map((item) => <li>{item}</li>)}
   </ul>
+  {related && <a class="experience__related" href={related.href}>{related.label} →</a>}
 </article>
 
 <style>
@@ -61,6 +64,12 @@ const { role, company, period, location, context, highlights } = Astro.props;
     padding-left: var(--space-4);
     list-style: disc;
     max-width: var(--measure);
+  }
+
+  .experience__related {
+    justify-self: start;
+    font-size: var(--step--1);
+    font-weight: 500;
   }
 
   .experience__list li::marker {
