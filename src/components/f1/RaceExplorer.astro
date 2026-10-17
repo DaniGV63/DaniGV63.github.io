@@ -19,7 +19,7 @@ const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u
 
   <div class="f1__bar">
     <div>
-      <p class="f1__kicker" id="pace-title">Race pace</p>
+      <h2 class="f1__kicker" id="pace-title">Race pace</h2>
       <p class="f1__hint">
         How the race unfolded for the drivers selected above. Dots mark a new set of tyres, filled
         with its compound. Click a lap for its sector times · ← → change lap.
@@ -101,6 +101,7 @@ const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u
   }
 
   .f1__kicker {
+    font-size: 1rem;
     font-weight: 800;
     font-style: italic;
     text-transform: uppercase;
@@ -134,6 +135,24 @@ const payload = JSON.stringify({ folder, meta, laps, track }).replace(/</g, '\\u
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+    /* Chips are drawn by script; reserve their height so the page does not jump. */
+    min-height: 5rem;
+  }
+
+  @media (max-width: 900px) {
+    .f1__chips {
+      min-height: 7.5rem;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .f1__chips {
+      min-height: 18.4rem;
+    }
+  }
+
+  #cmp-rows {
+    min-height: 34rem;
   }
 
   .f1-chip {

@@ -27,8 +27,9 @@ Marcar con [x] al terminar. Cada fase acaba con `npm run build` sin errores y un
 - [ ] Tarjeta/página publicación MDPI.
 
 ## Fase 4 — Pulido y lanzamiento
-- [ ] Lighthouse ≥ 90 en Performance, Accessibility, Best Practices y SEO.
-- [ ] Revisar todos los enlaces en ventana privada y en móvil.
+- [x] Lighthouse ≥ 90 en Performance, Accessibility, Best Practices y SEO (móvil: home 99/100/100/100, F1 96/100/100/100, Energinet 97/100/100/100).
+- [x] Revisar todos los enlaces (internos contra el build, externos con petición real).
+- [x] Imagen Open Graph (`public/og.png`), `robots.txt`, `sitemap.xml`, JSON-LD y 404 con noindex.
 - [ ] Añadir el enlace al CV, a LinkedIn (Featured) y al perfil de GitHub.
 
 ## Más adelante

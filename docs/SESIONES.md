@@ -83,3 +83,12 @@ Entre los 14 pilotos que terminaron, Hamilton ganó el 22 % de las partes que di
 ### Qué falta
 - Probar el workflow diario en GitHub (no se puede probar en local) y revisar el primer commit automático.
 - Fase 3: caso de estudio de Mática; Fase 4: Lighthouse, Open Graph, sitemap.
+
+
+## Fase 4 (17 de octubre de 2026)
+
+- Retoque "menos plantilla" publicado en `main`: Schibsted Grotesk en lugar de Inter, etiquetas en frase normal, tecnologías en texto corrido, cifras sin fuente monoespaciada. Ramas `design-original`, `design-original-tweaks` y `design-circuit` guardadas.
+- Lighthouse móvil (antes → después): home 98 → 99; F1 93/99 → 96/100; Energinet 94 → 97. CLS de F1 de 0,129 a 0,001 reservando el espacio de los chips y del gráfico; logos de F1 de 316 KB a 26 KB; CSS en línea; encabezados de F1 en orden.
+- SEO: imagen Open Graph 1200x630 (curva real de inercia), `twitter:card` grande, JSON-LD de persona, `robots.txt`, `sitemap.xml`, 404 con noindex.
+- Enlaces comprobados: 0 rotos.
+- Pendiente (de Dani): poner el enlace de la web en el CV, en LinkedIn (Destacados) y en el perfil de GitHub.
