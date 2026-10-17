@@ -1,0 +1,82 @@
+---
+import profile from '../../data/profile.json';
+import ContactLinks from '../ContactLinks.astro';
+import { publicFileExists } from '../../lib/assets';
+
+const hasPhoto = publicFileExists(profile.photo.src);
+const city = profile.location.split(',')[0];
+---
+
+<section class="intro" aria-labelledby="intro-title">
+  <div class="intro__head">
+    {
+      hasPhoto && (
+        <img
+          class="intro__photo"
+          src={profile.photo.src}
+          alt={profile.photo.alt}
+          width="96"
+          height="144"
+          decoding="async"
+        />
+      )
+    }
+    <div>
+      <h1 id="intro-title" class="intro__name">{profile.name}</h1>
+      <p class="intro__role">{profile.role} in {city}</p>
+    </div>
+  </div>
+  <p class="intro__headline">{profile.headline}</p>
+  <p class="intro__status">{profile.status}</p>
+  <ContactLinks />
+</section>
+
+<style>
+  .intro {
+    display: grid;
+    gap: var(--space-4);
+    padding-top: var(--space-8);
+  }
+
+  .intro__head {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-4);
+  }
+
+  .intro__photo {
+    width: 72px;
+    height: 108px;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  .intro__name {
+    font-size: clamp(2rem, 3.6vw, 3rem);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+
+  .intro__role {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .intro__headline {
+    max-width: 34ch;
+    font-size: var(--step-1);
+    line-height: 1.35;
+  }
+
+  .intro__status {
+    max-width: 44ch;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 900px) {
+    .intro {
+      padding-top: var(--space-16);
+    }
+  }
+</style>

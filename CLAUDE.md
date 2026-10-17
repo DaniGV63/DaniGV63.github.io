@@ -21,6 +21,7 @@ Web portfolio personal de **Daniel (Dani) Gómez Verde**, Data & AI Engineer y e
 | Gráfico F1 | **D3.js** (v7), cargado solo en la página de F1 |
 | Datos F1 | **FastF1** en Python, ejecutado **en local**; el resultado se guarda como JSON en `src/data/f1/` y se commitea. Nada de Python en el servidor ni en el navegador |
 | Coste | 0 € de hosting. Nada que requiera servidor, base de datos ni servicios de pago |
+| Ramas de diseño | `main` = lo publicado. `design-original` = diseño v1 (rejilla teal). `design-circuit` = rediseño Circuit (oscuro por defecto, escenario animado). Etiqueta `v1-original` sobre el último commit del diseño v1. Para publicar una versión: pasar a `main` y copiar su árbol (`git checkout <rama> -- .` y commit), sin forzar el push. Antes, traer a la rama los datos nuevos de Energinet (`git merge main`) |
 | Node | **24 LTS** (ver `.nvmrc`; Astro exige >= 22.12). CI usa la misma versión |
 
 ## 3. Contenido del lanzamiento (v1)

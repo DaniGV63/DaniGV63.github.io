@@ -2,36 +2,34 @@
 interface Props {
   id: string;
   title: string;
-  /** Optional one-line introduction under the title. */
-  lead?: string;
 }
 
-const { id, title, lead } = Astro.props;
+const { id, title } = Astro.props;
 ---
 
 <section id={id} aria-labelledby={`${id}-title`} class="section">
-  <div class="container">
-    <h2 id={`${id}-title`} class="section__title label">{title}</h2>
-    {lead && <p class="section__lead">{lead}</p>}
-    <slot />
-  </div>
+  <h2 id={`${id}-title`} class="section__title">{title}</h2>
+  <div class="section__body"><slot /></div>
 </section>
 
 <style>
   .section {
-    margin-top: var(--space-16);
-  }
-
-  .section__lead {
-    max-width: var(--measure);
-    margin-bottom: var(--space-6);
-    color: var(--color-text-muted);
+    display: grid;
+    gap: var(--space-6);
+    margin-top: var(--space-24);
+    padding-inline: var(--page-pad);
   }
 
   .section__title {
-    margin-bottom: var(--space-4);
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--color-border);
-    font-weight: 500;
+    font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  @media (min-width: 900px) {
+    .section {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: var(--space-12);
+    }
   }
 </style>

@@ -14,48 +14,38 @@ const { role, company, period, location, context, highlights, related } = Astro.
 ---
 
 <article class="experience">
-  <header class="experience__head">
-    <h3 class="experience__title">
-      {role} <span class="experience__company">· {company}</span>
-    </h3>
-    <p class="experience__meta mono">{period} · {location}</p>
-  </header>
+  <h3 class="experience__title">{role}, {company}</h3>
+  <p class="experience__meta">{period}, {location}</p>
   <p class="experience__context">{context}</p>
   <ul class="experience__list">
     {highlights.map((item) => <li>{item}</li>)}
   </ul>
-  {related && <a class="experience__related" href={related.href}>{related.label} →</a>}
+  {related && <a class="experience__related" href={related.href}>{related.label}</a>}
 </article>
 
 <style>
   .experience {
     display: grid;
-    gap: var(--space-3);
-    padding-bottom: var(--space-6);
-    border-bottom: 1px solid var(--color-border);
+    gap: var(--space-2);
   }
 
-  .experience:last-child {
-    border-bottom: 0;
-    padding-bottom: 0;
+  .experience + .experience {
+    margin-top: var(--space-8);
   }
 
   .experience__title {
     font-size: var(--step-1);
-  }
-
-  .experience__company {
-    color: var(--color-accent);
+    font-weight: 600;
+    line-height: 1.25;
   }
 
   .experience__meta {
-    margin-top: var(--space-1);
-    font-size: var(--step--1);
     color: var(--color-text-muted);
+    font-size: var(--step--1);
   }
 
   .experience__context {
-    color: var(--color-text-muted);
+    margin-top: var(--space-2);
   }
 
   .experience__list {
@@ -66,13 +56,20 @@ const { role, company, period, location, context, highlights, related } = Astro.
     max-width: var(--measure);
   }
 
-  .experience__related {
-    justify-self: start;
-    font-size: var(--step--1);
-    font-weight: 500;
-  }
-
   .experience__list li::marker {
     color: var(--color-text-muted);
+  }
+
+  .experience__related {
+    justify-self: start;
+    color: var(--color-text);
+    font-weight: 500;
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
+  }
+
+  .experience__related:hover {
+    color: var(--color-accent);
   }
 </style>

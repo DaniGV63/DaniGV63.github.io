@@ -1,0 +1,72 @@
+---
+import { hourDots } from '../../lib/homeArt';
+
+const BANDS = 20;
+const dots = hourDots(1500, 760, 460, BANDS);
+const bands = Array.from({ length: BANDS }, (_, i) => dots.filter((dot) => dot.band === i));
+---
+
+<svg viewBox="0 0 760 460" role="img" aria-label="Every sampled hour of the Danish grid: wind and solar share against DK2 inertia, coloured by hour type">
+  {
+    bands.map((band, i) => (
+      <g class="gd-band" style={`--i:${i}`}>
+        {band.map((dot) => (
+          <circle
+            cx={dot.x.toFixed(1)}
+            cy={dot.y.toFixed(1)}
+            r="3.4"
+            style={`fill:var(--art-c${dot.cluster})`}
+          ></circle>
+        ))}
+      </g>
+    ))
+  }
+  <rect class="gd-scan" x="0" y="0" width="3" height="460" rx="1.5"></rect>
+</svg>
+
+<style is:global>
+  .gd-band circle {
+    opacity: 0.72;
+  }
+
+  .gd-scan {
+    fill: var(--art-ink);
+    opacity: 0;
+  }
+
+  .art.on .gd-band {
+    animation: gd-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--i) * 60ms);
+  }
+
+  .art.on .gd-scan {
+    opacity: 0.75;
+    animation: gd-scan 4.2s linear 1.6s infinite;
+  }
+
+  @keyframes gd-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes gd-scan {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(757px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .art.on .gd-scan {
+      opacity: 0;
+    }
+  }
+</style>

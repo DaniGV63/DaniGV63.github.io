@@ -83,3 +83,19 @@ Entre los 14 pilotos que terminaron, Hamilton ganó el 22 % de las partes que di
 ### Qué falta
 - Probar el workflow diario en GitHub (no se puede probar en local) y revisar el primer commit automático.
 - Fase 3: caso de estudio de Mática; Fase 4: Lighthouse, Open Graph, sitemap.
+
+
+## Rediseño "Circuit" (rama `design-circuit`, 17 de octubre de 2026)
+
+### Qué se hizo
+- Ramas: `main` (publicada), `design-original` (diseño v1) y `design-circuit` (nueva). Etiqueta `v1-original`.
+- Elegida la opción I1 entre diez prototipos (skills de GitHub leídas, no instaladas: Taste Skill, Impeccable, Hallmark, más `frontend-design` de Anthropic).
+- Home nueva: presentación con foto a la izquierda y lista de proyectos; a la derecha, un escenario fijo con la pieza animada del proyecto señalado (circuito de F1, horas de la red danesa, chat de BotLLM, señal EMG). En móvil cada pieza va encima de su proyecto.
+- Oscuro por defecto con variante clara (el botón de tema sigue). Onest auto-alojada (OFL) en lugar de Inter.
+- Secciones de siempre: What I do, Experience (con el enlace de Endesa), Toolbox, Education and languages y contacto.
+- Cabecera, pie, colores y tipografía nuevos también en las páginas de F1 y Danish Power System.
+
+### Para publicarla
+1. `git checkout design-circuit && git merge main` (trae los datos diarios de Energinet).
+2. Probar con `npm run dev` y `npm run build`.
+3. En `main`: `git checkout design-circuit -- .` y commit; push. Para volver: lo mismo con `design-original`.

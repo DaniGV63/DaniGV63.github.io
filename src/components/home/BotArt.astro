@@ -1,0 +1,126 @@
+---
+---
+
+<svg viewBox="0 0 760 460" role="img" aria-label="A chat that ends in a booked appointment">
+  <g class="bot-step" style="--d:0s">
+    <rect class="bot-in" x="30" y="30" width="440" height="100" rx="20"></rect>
+    <rect class="bot-line" x="62" y="62" width="300" height="12" rx="6"></rect>
+    <rect class="bot-line" x="62" y="88" width="190" height="12" rx="6"></rect>
+  </g>
+  <g class="bot-step" style="--d:1.1s">
+    <rect class="bot-out" x="290" y="152" width="440" height="100" rx="20"></rect>
+    <rect class="bot-line-out" x="322" y="184" width="320" height="12" rx="6"></rect>
+    <rect class="bot-line-out" x="322" y="210" width="200" height="12" rx="6"></rect>
+  </g>
+  <g class="bot-step" style="--d:2.2s">
+    <rect class="bot-in" x="30" y="274" width="140" height="64" rx="20"></rect>
+    <circle class="bot-dot" style="--k:0s" cx="66" cy="306" r="8"></circle>
+    <circle class="bot-dot" style="--k:0.15s" cx="100" cy="306" r="8"></circle>
+    <circle class="bot-dot" style="--k:0.3s" cx="134" cy="306" r="8"></circle>
+  </g>
+  <g class="bot-step" style="--d:3.4s">
+    <rect class="bot-slot" x="290" y="300" width="440" height="136" rx="16"></rect>
+    <rect class="bot-slot-head" x="290" y="300" width="440" height="34" rx="16"></rect>
+    <rect class="bot-line" x="322" y="360" width="220" height="12" rx="6"></rect>
+    <rect class="bot-line" x="322" y="388" width="140" height="12" rx="6"></rect>
+    <circle class="bot-check" cx="672" cy="388" r="26"></circle>
+    <path class="bot-tick" d="m660 388 9 9 17-19"></path>
+  </g>
+</svg>
+
+<style is:global>
+  .bot-in {
+    fill: var(--art-bubble);
+  }
+
+  .bot-out {
+    fill: var(--art-green);
+    opacity: 0.9;
+  }
+
+  .bot-line {
+    fill: var(--art-ink);
+    opacity: 0.38;
+  }
+
+  .bot-line-out {
+    fill: var(--art-on-green);
+    opacity: 0.85;
+  }
+
+  .bot-dot {
+    fill: var(--art-ink);
+    opacity: 0.55;
+  }
+
+  .bot-slot {
+    fill: none;
+    stroke: var(--art-green);
+    stroke-width: 3;
+  }
+
+  .bot-slot-head {
+    fill: var(--art-green);
+  }
+
+  .bot-check {
+    fill: var(--art-green);
+  }
+
+  .bot-tick {
+    fill: none;
+    stroke: var(--art-on-green);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .bot-step {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .art.on .bot-step {
+    animation: bot-step 9s ease infinite;
+    animation-delay: var(--d);
+  }
+
+  .art.on .bot-dot {
+    animation: bot-bounce 0.9s ease-in-out infinite;
+    animation-delay: var(--k);
+  }
+
+  @keyframes bot-step {
+    0% {
+      opacity: 0;
+      transform: translateY(14px) scale(0.96);
+    }
+    6%,
+    90% {
+      opacity: 1;
+      transform: none;
+    }
+    97%,
+    100% {
+      opacity: 0;
+      transform: none;
+    }
+  }
+
+  @keyframes bot-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .art.on .bot-step,
+    .art.on .bot-dot {
+      animation: none;
+    }
+  }
+</style>

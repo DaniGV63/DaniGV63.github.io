@@ -1,0 +1,71 @@
+---
+import { circuitPath } from '../../lib/homeArt';
+
+const d = circuitPath(760, 460, 24);
+---
+
+<svg viewBox="0 0 760 460" role="img" aria-label="Outline of the Yas Marina circuit, with a mark that runs a lap">
+  <path class="f1-base" d={d}></path>
+  <path class="f1-line" d={d} pathLength="100"></path>
+  <path class="f1-comet" d={d} pathLength="100"></path>
+</svg>
+
+<style is:global>
+  .f1-base,
+  .f1-line,
+  .f1-comet {
+    fill: none;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .f1-base {
+    stroke: var(--art-weak);
+    stroke-width: 14;
+  }
+
+  .f1-line {
+    stroke: var(--art-ink);
+    stroke-width: 2;
+    stroke-dasharray: 100;
+  }
+
+  .f1-comet {
+    stroke: var(--art-f1);
+    stroke-width: 7;
+    stroke-dasharray: 0 100;
+  }
+
+  .art.on .f1-line {
+    animation: f1-draw 1.8s ease both;
+  }
+
+  .art.on .f1-comet {
+    stroke-dasharray: 7 93;
+    animation: f1-lap 3.4s linear infinite;
+  }
+
+  @keyframes f1-draw {
+    from {
+      stroke-dashoffset: 100;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes f1-lap {
+    from {
+      stroke-dashoffset: 0;
+    }
+    to {
+      stroke-dashoffset: -100;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .art.on .f1-comet {
+      stroke-dasharray: 0 100;
+    }
+  }
+</style>

@@ -1,95 +1,29 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
 import Section from '../components/Section.astro';
-import StrengthGrid from '../components/StrengthGrid.astro';
-import ProjectCard from '../components/ProjectCard.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
-import F1Banner from '../components/F1Banner.astro';
-import BotBanner from '../components/BotBanner.astro';
-import EmgBanner from '../components/EmgBanner.astro';
-import GridBanner from '../components/GridBanner.astro';
-import TagList from '../components/TagList.astro';
+import Intro from '../components/home/Intro.astro';
+import Work from '../components/home/Work.astro';
+import Proofs from '../components/home/Proofs.astro';
 import profile from '../data/profile.json';
 
-const featuredProject = profile.projects.find((p) => p.featured && p.id === 'f1-race-analysis');
-const gridProject = profile.projects.find((p) => p.id === 'danish-grid');
-const otherProjects = profile.projects.filter(
-  (p) => p.id !== featuredProject?.id && p.id !== gridProject?.id,
-);
 const endesaRelated = {
   href: '/projects/danish-grid/',
   label: 'See the same method on public Danish data',
 };
-const banners: Record<string, string> = { botllm: '#19c3a6', 'mdpi-emg': '#a78bfa' };
 ---
 
 <BaseLayout>
-  <Hero />
+  <Work>
+    <Intro />
+  </Work>
 
   <Section id="what-i-do" title="What I do">
-    <StrengthGrid items={profile.strengths} />
-  </Section>
-
-  <Section
-    id="work"
-    title="Selected work"
-    lead="Side projects and research I built to show how I work with data: pipelines, analysis and interactive charts."
-  >
-    <div class="work">
-      {
-        featuredProject && (
-          <ProjectCard
-            title={featuredProject.title}
-            summary={featuredProject.summary}
-            href={featuredProject.href}
-            tags={featuredProject.tags}
-            status={featuredProject.status}
-            featured
-            banner
-          >
-            <F1Banner slot="banner" />
-          </ProjectCard>
-        )
-      }
-      {
-        gridProject && (
-          <ProjectCard
-            title={gridProject.title}
-            summary={gridProject.summary}
-            href={gridProject.href}
-            tags={gridProject.tags}
-            featured
-            banner
-            accent="#f0a30a"
-            logo="/energinet.svg"
-          >
-            <GridBanner slot="banner" />
-          </ProjectCard>
-        )
-      }
-      <div class="work__row">
-        {
-          otherProjects.map((project) => (
-            <ProjectCard
-              title={project.title}
-              summary={project.summary}
-              href={project.href}
-              tags={project.tags}
-              banner={project.id in banners}
-              accent={banners[project.id]}
-            >
-              {project.id === 'botllm' && <BotBanner slot="banner" />}
-              {project.id === 'mdpi-emg' && <EmgBanner slot="banner" />}
-            </ProjectCard>
-          ))
-        }
-      </div>
-    </div>
+    <Proofs items={profile.strengths} />
   </Section>
 
   <Section id="experience" title="Experience">
-    <div class="stack">
+    <div>
       {
         profile.experience.map((job) => (
           <ExperienceItem
@@ -107,67 +41,51 @@ const banners: Record<string, string> = { botllm: '#19c3a6', 'mdpi-emg': '#a78bf
   </Section>
 
   <Section id="toolbox" title="Toolbox">
-    <div class="toolbox">
+    <ul class="toolbox">
       {
         Object.entries(profile.skills).map(([group, tags]) => (
-          <div>
-            <h3 class="toolbox__group">{group}</h3>
-            <TagList tags={tags} />
-          </div>
+          <li>
+            <strong>{group}.</strong> {tags.join(', ')}.
+          </li>
         ))
       }
-    </div>
+    </ul>
   </Section>
 
-  <Section id="education" title="Education & languages">
+  <Section id="education" title="Education and languages">
     <div class="education">
-      <div>
-        <h3 class="toolbox__group">Education</h3>
-        <ul class="stack stack--tight">
-          {
-            profile.education.map((item) => (
-              <li>
-                <p class="education__degree">{item.degree}</p>
-                <p class="education__meta mono">{item.school} · {item.period}</p>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-      <div>
-        <h3 class="toolbox__group">Languages</h3>
-        <ul class="stack stack--tight">
-          {profile.languages.map((language) => <li>{language}</li>)}
-        </ul>
-      </div>
+      <ul>
+        {
+          profile.education.map((item) => (
+            <li class="education__item">
+              <strong>{item.degree}</strong>
+              <span>{item.school}</span>
+              <span class="education__period">{item.period}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="languages">
+        {profile.languages.map((language) => <li>{language}</li>)}
+      </ul>
     </div>
   </Section>
 </BaseLayout>
 
 <style>
-  .work,
-  .stack {
-    display: grid;
-    gap: var(--space-6);
-  }
-
-  .stack--tight {
-    gap: var(--space-4);
-  }
-
-  .work__row {
-    display: grid;
-    gap: var(--space-4);
-  }
-
   .toolbox {
     display: grid;
-    gap: var(--space-6);
+    gap: var(--space-3);
+    max-width: var(--measure);
   }
 
-  .toolbox__group {
-    margin-bottom: var(--space-2);
-    font-size: var(--step-0);
+  .toolbox li {
+    color: var(--color-text-muted);
+  }
+
+  .toolbox strong {
+    color: var(--color-text);
+    font-weight: 600;
   }
 
   .education {
@@ -175,24 +93,32 @@ const banners: Record<string, string> = { botllm: '#19c3a6', 'mdpi-emg': '#a78bf
     gap: var(--space-8);
   }
 
-  .education__degree {
-    font-weight: 600;
+  .education__item {
+    display: grid;
+    gap: 2px;
   }
 
-  .education__meta {
-    font-size: var(--step--1);
+  .education__item + .education__item {
+    margin-top: var(--space-4);
+  }
+
+  .education__item span {
     color: var(--color-text-muted);
   }
 
-  @media (min-width: 720px) {
-    .work__row {
-      grid-template-columns: repeat(2, 1fr);
-    }
+  .education__period {
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+  }
 
-    .toolbox {
-      grid-template-columns: repeat(3, 1fr);
-    }
+  .languages {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+    color: var(--color-text-muted);
+  }
 
+  @media (min-width: 640px) {
     .education {
       grid-template-columns: 2fr 1fr;
     }

@@ -2,76 +2,36 @@
 import profile from '../data/profile.json';
 import { publicFileExists } from '../lib/assets';
 
-interface Props {
-  /** Show the CV link first, as the primary action. */
-  primaryCv?: boolean;
-}
-
-const { primaryCv = false } = Astro.props;
 const { links } = profile;
 const hasCv = publicFileExists(links.cv);
 ---
 
 <ul class="contact-links">
-  {
-    hasCv && (
-      <li>
-        <a
-          class:list={['contact-links__link', { 'contact-links__link--primary': primaryCv }]}
-          href={links.cv}
-          download
-        >
-          Download CV (PDF)
-        </a>
-      </li>
-    )
-  }
-  <li>
-    <a class="contact-links__link" href={links.linkedin} rel="noopener">LinkedIn</a>
-  </li>
-  <li>
-    <a
-      class="contact-links__link"
-      href={`mailto:${links.email}`}
-      aria-label="Mail Daniel Gómez Verde"
-    >
-      Mail
-    </a>
-  </li>
+  {hasCv && <li><a class="contact-links__cv" href={links.cv} download>Download CV (PDF)</a></li>}
+  <li><a href={links.linkedin} rel="noopener">LinkedIn</a></li>
+  <li><a href={`mailto:${links.email}`} aria-label="Mail Daniel Gómez Verde">Mail</a></li>
 </ul>
 
 <style>
   .contact-links {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: var(--space-2) var(--space-6);
   }
 
-  .contact-links__link {
-    display: inline-block;
-    padding: var(--space-2) var(--space-3);
+  .contact-links a {
     color: var(--color-text);
-    text-decoration: none;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    font-size: var(--step--1);
     font-weight: 500;
-    overflow-wrap: anywhere;
+    text-decoration-color: var(--color-accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
   }
 
-  .contact-links__link:hover {
-    background: var(--color-surface);
-    border-color: var(--color-text-muted);
+  .contact-links a:hover {
+    color: var(--color-accent);
   }
 
-  .contact-links__link--primary {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-    color: var(--color-accent-text);
-  }
-
-  .contact-links__link--primary:hover {
-    background: var(--color-accent);
-    filter: brightness(1.1);
+  .contact-links__cv {
+    font-weight: 600;
   }
 </style>

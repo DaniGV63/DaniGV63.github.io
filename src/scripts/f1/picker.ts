@@ -38,9 +38,8 @@ function emit(): void {
 }
 
 export function isDarkTheme(): boolean {
-  const explicit = document.documentElement.dataset.theme;
-  if (explicit) return explicit === 'dark';
-  return matchMedia('(prefers-color-scheme: dark)').matches;
+  // Dark is the site default unless the visitor chose light.
+  return document.documentElement.dataset.theme !== 'light';
 }
 
 /** Keep hue and chroma, move perceived lightness into a readable range. */

@@ -1,11 +1,11 @@
-/* Design system — direction C "Engineering grid".
+/* Design system — "Circuit": dark by default, tinted blue neutrals, the work leads.
    Colours are defined once with light-dark(); the active scheme comes from
    `color-scheme`, which follows the OS unless the toggle sets data-theme. */
 
 @font-face {
-  font-family: 'Inter Variable';
-  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
-  font-weight: 100 900;
+  font-family: 'Onest Variable';
+  src: url('/fonts/onest-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
 }
@@ -31,11 +31,11 @@
 
 /* Metric-matched system fallbacks so text does not jump when the fonts load. */
 @font-face {
-  font-family: 'Inter Fallback';
+  font-family: 'Onest Fallback';
   src: local('Arial');
-  size-adjust: 107.4%;
-  ascent-override: 90.2%;
-  descent-override: 22.5%;
+  size-adjust: 103%;
+  ascent-override: 95%;
+  descent-override: 25%;
   line-gap-override: 0%;
 }
 
@@ -49,19 +49,36 @@
 }
 
 :root {
-  color-scheme: light dark;
+  /* Dark is the default; the toggle sets data-theme="light" for the other one. */
+  color-scheme: dark;
 
-  --color-bg: light-dark(#ffffff, #0e1211);
-  --color-surface: light-dark(#f5f6f5, #151b19);
-  --color-surface-2: light-dark(#eceeed, #1c2422);
-  --color-text: light-dark(#14171a, #e7ecea);
-  --color-text-muted: light-dark(#566067, #9aa7a3);
-  --color-border: light-dark(#dfe3e1, #26302d);
-  --color-accent: light-dark(#0b6b5c, #4fd1b8);
-  --color-accent-text: light-dark(#ffffff, #06201b);
+  --color-bg: light-dark(#f4f6f9, #0e1620);
+  --color-surface: light-dark(#e9eef4, #142030);
+  --color-surface-2: light-dark(#dde5ee, #1b2a3d);
+  --color-text: light-dark(#0f1722, #e8edf3);
+  --color-text-muted: light-dark(#4a586a, #9bacbf);
+  --color-border: light-dark(#d2dae4, #243448);
+  --color-accent: light-dark(#0a6b86, #4fc3c7);
+  --color-accent-text: light-dark(#ffffff, #04202a);
   --color-focus: var(--color-accent);
 
-  --font-sans: 'Inter Variable', 'Inter Fallback', system-ui, -apple-system,
+  /* Colours of the animated pieces on the home page, one pair for each theme. */
+  --art-ink: light-dark(#0f1722, #e8edf3);
+  --art-weak: light-dark(#c4d0de, #2a3a4e);
+  --art-bubble: light-dark(#cfdbe8, #26384d);
+  --art-f1: light-dark(#d6342b, #f0534a);
+  --art-green: light-dark(#1f8a5b, #58c48c);
+  --art-on-green: light-dark(#ffffff, #0a2a1c);
+  --art-violet: light-dark(#6b4fd0, #a893f0);
+  --art-c0: light-dark(#1b7fc0, #56b4e9);
+  --art-c1: light-dark(#b87500, #e69f00);
+  --art-c2: light-dark(#b0467f, #e58bc0);
+  --p-f1: light-dark(#d6342b, #f0534a);
+  --p-grid: light-dark(#0a7f86, #4fc3c7);
+  --p-bot: light-dark(#1f8a5b, #58c48c);
+  --p-emg: light-dark(#6b4fd0, #a893f0);
+
+  --font-sans: 'Onest Variable', 'Onest Fallback', system-ui, -apple-system,
     'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono Fallback',
     ui-monospace, 'Cascadia Mono', Consolas, monospace;
@@ -84,10 +101,11 @@
   --space-24: 6rem;
 
   --gutter: 1rem;
+  --page-pad: clamp(1.25rem, 4vw, 3.5rem);
   --max-width: 1080px;
   --measure: 68ch;
-  --radius-sm: 4px;
-  --radius: 8px;
+  --radius-sm: 3px;
+  --radius: 6px;
 }
 
 :root[data-theme='light'] {
@@ -204,15 +222,12 @@ a:hover {
 }
 
 .mono {
-  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
 .label {
-  font-family: var(--font-mono);
   font-size: var(--step--1);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-weight: 600;
   color: var(--color-text-muted);
 }
 

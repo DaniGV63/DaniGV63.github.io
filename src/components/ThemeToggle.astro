@@ -48,9 +48,8 @@
   const button = document.getElementById('theme-toggle');
 
   const isDark = (): boolean => {
-    const explicit = root.dataset.theme;
-    if (explicit) return explicit === 'dark';
-    return matchMedia('(prefers-color-scheme: dark)').matches;
+    // Dark unless the visitor chose light.
+    return root.dataset.theme !== 'light';
   };
 
   const sync = (): void => {

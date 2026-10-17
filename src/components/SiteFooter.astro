@@ -1,49 +1,62 @@
 ---
 import profile from '../data/profile.json';
-import ContactLinks from './ContactLinks.astro';
 
-const repoUrl = `${profile.links.github}/DaniGV63.github.io`;
+const { links } = profile;
+const repoUrl = `${links.github}/DaniGV63.github.io`;
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer" id="contact">
-  <div class="container site-footer__inner">
-    <div>
-      <h2 class="site-footer__title">Contact</h2>
-      <p class="site-footer__lead">
-        Looking for a part-time student job in data/AI in Aarhus.
-      </p>
-    </div>
-    <ContactLinks />
-    <p class="site-footer__legal"><slot name="legal" /></p>
-    <p class="site-footer__credit">
-      © {year} {profile.name} · Built with{' '}
-      <a href="https://astro.build" rel="noopener">Astro</a> ·{' '}
-      <a href={repoUrl} rel="noopener">Source on GitHub</a>
-    </p>
-  </div>
+  <p class="site-footer__lead">Looking for a part-time student job in data/AI in Aarhus.</p>
+  <a class="site-footer__mail" href={`mailto:${links.email}`}>{links.email}</a>
+  <ul class="site-footer__links">
+    <li><a href={links.linkedin} rel="noopener">LinkedIn</a></li>
+    <li><a href={links.github} rel="noopener">GitHub</a></li>
+    <li><a href={links.cv} download>CV as PDF</a></li>
+  </ul>
+  <p class="site-footer__legal"><slot name="legal" /></p>
+  <p class="site-footer__credit">
+    © {year} {profile.name}. Built with <a href="https://astro.build" rel="noopener">Astro</a>.{' '}
+    <a href={repoUrl} rel="noopener">Source on GitHub</a>.
+  </p>
 </footer>
 
 <style>
   .site-footer {
-    margin-top: var(--space-24);
-    padding-block: var(--space-12);
-    background: var(--color-surface);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .site-footer__inner {
     display: grid;
-    gap: var(--space-6);
-  }
-
-  .site-footer__title {
-    font-size: var(--step-2);
+    gap: var(--space-4);
+    margin-top: var(--space-24);
+    padding: var(--space-16) var(--page-pad) var(--space-12);
+    background: var(--color-surface);
   }
 
   .site-footer__lead {
-    margin-top: var(--space-2);
     color: var(--color-text-muted);
+  }
+
+  .site-footer__mail {
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 5vw, 4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+  }
+
+  .site-footer__mail:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 0.06em;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+  }
+
+  .site-footer__links a {
+    color: var(--color-text);
   }
 
   .site-footer__legal:empty {
@@ -53,6 +66,11 @@ const year = new Date().getFullYear();
   .site-footer__legal,
   .site-footer__credit {
     font-size: var(--step--1);
+    color: var(--color-text-muted);
+    max-width: 80ch;
+  }
+
+  .site-footer__credit a {
     color: var(--color-text-muted);
   }
 </style>

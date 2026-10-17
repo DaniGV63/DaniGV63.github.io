@@ -1,0 +1,252 @@
+---
+// Selected work: a list of projects on the left and, on wide screens, a sticky
+// stage on the right that shows the animated piece of the project being pointed
+// at. On narrow screens each piece sits above its project instead. A small
+// script moves the pieces between the two places; without it the narrow layout
+// is shown everywhere.
+import profile from '../../data/profile.json';
+import energinet from '../../data/energinet/meta.json';
+import { isExternal } from '../../lib/assets';
+import F1Art from './F1Art.astro';
+import GridArt from './GridArt.astro';
+import BotArt from './BotArt.astro';
+import EmgArt from './EmgArt.astro';
+
+const extra: Record<string, { name: string; line: string; accent: string }> = {
+  'f1-race-analysis': { name: 'F1 Race Analysis', line: '2026, 14 finishers compared', accent: '--p-f1' },
+  'danish-grid': {
+    name: 'Danish Power System',
+    line: `2026, ${energinet.hours.toLocaleString('en')} hours, ${energinet.k} hour types`,
+    accent: '--p-grid',
+  },
+  botllm: { name: 'BotLLM', line: '2026, built end to end', accent: '--p-bot' },
+  'mdpi-emg': {
+    name: 'Gesture recognition with EMG and deep learning',
+    line: '2024, 90% accuracy against an 85% benchmark',
+    accent: '--p-emg',
+  },
+};
+const order = ['f1-race-analysis', 'danish-grid', 'botllm', 'mdpi-emg'];
+const items = order.map((id) => ({ ...profile.projects.find((p) => p.id === id)!, ...extra[id]! }));
+---
+
+<div class="shell" id="work">
+  <div class="shell__left">
+    <slot />
+    <div class="work">
+      <p class="work__lead">
+        Side projects and research I built to show how I work with data: pipelines, analysis and
+        interactive charts.
+      </p>
+      <ul class="work__list">
+        {
+          items.map((project, i) => (
+            <li class:list={['work-item', { 'is-active': i === 0 }]} data-id={project.id} style={`--acc:var(${project.accent})`}>
+              <figure class:list={['art', { on: i === 0 }]} data-id={project.id}>
+                {project.id === 'f1-race-analysis' && <F1Art />}
+                {project.id === 'danish-grid' && <GridArt />}
+                {project.id === 'botllm' && <BotArt />}
+                {project.id === 'mdpi-emg' && <EmgArt />}
+                <figcaption class="art__cap">
+                  <p>{project.summary}</p>
+                  <p class="art__tags">{project.tags.join(', ')}</p>
+                  <a href={project.href} rel={isExternal(project.href) ? 'noopener' : undefined}>
+                    Open the project
+                  </a>
+                </figcaption>
+              </figure>
+              <a class="work-link" href={project.href} rel={isExternal(project.href) ? 'noopener' : undefined}>
+                <b>{project.name}</b>
+                <span>{project.line}</span>
+              </a>
+              <p class="work-desc">{project.summary}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+  <div class="stage" id="stage"></div>
+</div>
+
+<style is:global>
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shell__left {
+    padding-inline: var(--page-pad);
+  }
+
+  .work {
+    margin-top: var(--space-16);
+  }
+
+  .work__lead {
+    max-width: 44ch;
+    color: var(--color-text-muted);
+  }
+
+  .work__list {
+    margin-top: var(--space-6);
+  }
+
+  .work-item {
+    padding-block: var(--space-6);
+  }
+
+  .work-link {
+    display: block;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .work-link b {
+    display: block;
+    font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .work-link span {
+    display: block;
+    margin-top: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .work-desc {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .art {
+    margin: 0 0 var(--space-4);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border-radius: var(--radius);
+  }
+
+  .art svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .art__cap {
+    display: none;
+  }
+
+  .stage {
+    display: none;
+  }
+
+  @media (min-width: 900px) {
+    .shell {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    }
+
+    .stage {
+      position: sticky;
+      top: 0;
+      display: grid;
+      align-content: center;
+      height: 100svh;
+      padding: clamp(1.5rem, 4vw, 4rem);
+      background: var(--color-surface);
+    }
+
+    .stage .art {
+      display: none;
+      width: 100%;
+      max-width: 760px;
+      margin: 0;
+      padding: 0;
+      background: none;
+    }
+
+    .stage .art.on {
+      display: block;
+    }
+
+    .stage .art__cap {
+      display: grid;
+      gap: var(--space-2);
+      max-width: 56ch;
+      margin-top: var(--space-6);
+      color: var(--color-text-muted);
+    }
+
+    .stage .art__cap a {
+      justify-self: start;
+      color: var(--color-text);
+      text-decoration-color: var(--acc, var(--color-accent));
+      text-decoration-thickness: 2px;
+      text-underline-offset: 0.25em;
+    }
+
+    .work-item {
+      padding-block: var(--space-4);
+    }
+
+    .work-link {
+      color: var(--color-text-muted);
+      transition: color 0.2s;
+    }
+
+    .work-item.is-active .work-link,
+    .work-link:hover,
+    .work-link:focus-visible {
+      color: var(--color-text);
+    }
+
+    .work-item.is-active .work-link b {
+      text-decoration: underline;
+      text-decoration-color: var(--acc);
+      text-decoration-thickness: 0.07em;
+      text-underline-offset: 0.18em;
+    }
+
+    .work-desc {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const wide = matchMedia('(min-width: 900px)');
+  const stage = document.getElementById('stage')!;
+  const items = Array.from(document.querySelectorAll<HTMLElement>('.work-item'));
+  const arts = new Map(items.map((item) => [item.dataset.id!, item.querySelector<HTMLElement>('.art')!]));
+  let current = items[0]!.dataset.id!;
+
+  function show(id: string): void {
+    current = id;
+    arts.forEach((art, key) => art.classList.toggle('on', key === id));
+    items.forEach((item) => item.classList.toggle('is-active', item.dataset.id === id));
+  }
+
+  function place(): void {
+    if (wide.matches) {
+      arts.forEach((art) => stage.append(art));
+      show(current);
+    } else {
+      items.forEach((item) => item.prepend(arts.get(item.dataset.id!)!));
+      arts.forEach((art) => art.classList.add('on'));
+    }
+  }
+
+  items.forEach((item) => {
+    const link = item.querySelector('.work-link')!;
+    const activate = (): void => {
+      if (wide.matches) show(item.dataset.id!);
+    };
+    link.addEventListener('mouseenter', activate);
+    link.addEventListener('focus', activate);
+  });
+  wide.addEventListener('change', place);
+  place();
+</script>
