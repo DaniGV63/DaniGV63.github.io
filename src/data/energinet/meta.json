@@ -1,11 +1,11 @@
 {
- "generatedAt": "2026-11-05T13:31:02+00:00",
+ "generatedAt": "2026-11-06T13:13:18+00:00",
  "window": {
   "from": "2025-03-04T11:00:00+00:00",
-  "to": "2026-10-27T23:00:00+00:00"
+  "to": "2026-10-28T23:00:00+00:00"
  },
- "hours": 14345,
- "localHours": 13574,
+ "hours": 14369,
+ "localHours": 13598,
  "localExcludedHours": 771,
  "area": "DK2",
  "municipality": {
@@ -46,10 +46,10 @@
  },
  "k": 3,
  "silhouette": {
-  "3": 0.218,
-  "4": 0.191,
-  "5": 0.166,
-  "6": 0.164
+  "3": 0.222,
+  "4": 0.19,
+  "5": 0.167,
+  "6": 0.163
  },
  "explained": [
   0.317,
@@ -57,7 +57,7 @@
  ],
  "outliers": 144,
  "localOverall": {
-  "hours": 13574,
+  "hours": 13598,
   "median": 0.111,
   "p25": 0.037,
   "p75": 0.151
@@ -65,19 +65,19 @@
  "clusters": [
   {
    "id": 0,
-   "hours": 6978,
-   "share": 0.4864,
+   "hours": 6963,
+   "share": 0.4846,
    "label": "low wind and solar in DK2 · low wind and solar in DK1",
    "mean": {
-    "re_share_dk1": 0.486,
+    "re_share_dk1": 0.485,
     "re_share_dk2": 0.25,
-    "inertia_dk2": 6.939,
-    "inertia_nordic": 198.895,
-    "fcr_mw": 120.432,
-    "imbalance_gap_eur": 91.808
+    "inertia_dk2": 6.944,
+    "inertia_nordic": 198.882,
+    "fcr_mw": 120.457,
+    "imbalance_gap_eur": 91.975
    },
    "local": {
-    "hours": 6294,
+    "hours": 6279,
     "median": 0.121,
     "p25": 0.065,
     "p75": 0.153
@@ -86,7 +86,7 @@
   {
    "id": 1,
    "hours": 708,
-   "share": 0.0494,
+   "share": 0.0493,
    "label": "calm balancing",
    "mean": {
     "re_share_dk1": 0.698,
@@ -105,19 +105,19 @@
   },
   {
    "id": 2,
-   "hours": 6659,
-   "share": 0.4642,
+   "hours": 6698,
+   "share": 0.4661,
    "label": "high wind and solar in DK2 · high wind and solar in DK1",
    "mean": {
-    "re_share_dk1": 0.993,
-    "re_share_dk2": 0.581,
-    "inertia_dk2": 5.564,
-    "inertia_nordic": 165.18,
-    "fcr_mw": 119.625,
-    "imbalance_gap_eur": 62.694
+    "re_share_dk1": 0.992,
+    "re_share_dk2": 0.58,
+    "inertia_dk2": 5.565,
+    "inertia_nordic": 165.246,
+    "fcr_mw": 119.651,
+    "imbalance_gap_eur": 62.757
    },
    "local": {
-    "hours": 6593,
+    "hours": 6632,
     "median": 0.088,
     "p25": 0.029,
     "p75": 0.146
@@ -127,20 +127,20 @@
  "model": {
   "target": "DK2 inertia well below its level of the previous 30 days",
   "thresholdGWs": -1.81,
-  "trainHours": 11188,
-  "testHours": 2797,
-  "testFrom": "2026-07-03T08:00:00+00:00",
-  "lowShareTest": 0.179,
+  "trainHours": 11207,
+  "testHours": 2802,
+  "testFrom": "2026-07-04T03:00:00+00:00",
+  "lowShareTest": 0.178,
   "baseline": {
-   "auc": 0.685,
-   "average_precision": 0.285
+   "auc": 0.687,
+   "average_precision": 0.286
   },
   "withRenewables": {
-   "auc": 0.698,
-   "average_precision": 0.282
+   "auc": 0.701,
+   "average_precision": 0.28
   },
-  "aucGain": 0.013,
-  "chance": 0.179
+  "aucGain": 0.015,
+  "chance": 0.178
  },
  "correlations": {
   "columns": [
@@ -221,123 +221,123 @@
  "localByHour": [
   {
    "key": 0,
-   "median": 0.136,
-   "hours": 562
+   "median": 0.137,
+   "hours": 563
   },
   {
    "key": 1,
-   "median": 0.139,
-   "hours": 564
+   "median": 0.14,
+   "hours": 565
   },
   {
    "key": 2,
-   "median": 0.137,
-   "hours": 564
+   "median": 0.138,
+   "hours": 565
   },
   {
    "key": 3,
    "median": 0.137,
-   "hours": 563
+   "hours": 564
   },
   {
    "key": 4,
-   "median": 0.14,
-   "hours": 561
+   "median": 0.141,
+   "hours": 562
   },
   {
    "key": 5,
    "median": 0.148,
-   "hours": 565
+   "hours": 566
   },
   {
    "key": 6,
    "median": 0.131,
-   "hours": 566
+   "hours": 567
   },
   {
    "key": 7,
    "median": 0.114,
-   "hours": 565
+   "hours": 566
   },
   {
    "key": 8,
    "median": 0.109,
-   "hours": 564
+   "hours": 565
   },
   {
    "key": 9,
    "median": 0.107,
-   "hours": 565
+   "hours": 566
   },
   {
    "key": 10,
    "median": 0.102,
-   "hours": 569
+   "hours": 570
   },
   {
    "key": 11,
    "median": 0.099,
-   "hours": 570
+   "hours": 571
   },
   {
    "key": 12,
    "median": 0.093,
-   "hours": 571
+   "hours": 572
   },
   {
    "key": 13,
    "median": 0.091,
-   "hours": 569
+   "hours": 570
   },
   {
    "key": 14,
-   "median": 0.09,
-   "hours": 567
+   "median": 0.091,
+   "hours": 568
   },
   {
    "key": 15,
-   "median": 0.097,
-   "hours": 567
+   "median": 0.098,
+   "hours": 568
   },
   {
    "key": 16,
-   "median": 0.097,
-   "hours": 567
+   "median": 0.098,
+   "hours": 568
   },
   {
    "key": 17,
    "median": 0.099,
-   "hours": 566
+   "hours": 567
   },
   {
    "key": 18,
    "median": 0.104,
-   "hours": 563
+   "hours": 564
   },
   {
    "key": 19,
    "median": 0.111,
-   "hours": 563
+   "hours": 564
   },
   {
    "key": 20,
    "median": 0.119,
-   "hours": 566
+   "hours": 567
   },
   {
    "key": 21,
    "median": 0.126,
-   "hours": 565
+   "hours": 566
   },
   {
    "key": 22,
    "median": 0.135,
-   "hours": 565
+   "hours": 566
   },
   {
    "key": 23,
    "median": 0.143,
-   "hours": 567
+   "hours": 568
   }
  ],
  "localByMonth": [
@@ -388,8 +388,8 @@
   },
   {
    "key": 10,
-   "median": 0.13,
-   "hours": 1394
+   "median": 0.131,
+   "hours": 1418
   },
   {
    "key": 11,
@@ -403,24 +403,24 @@
   }
  ],
  "latestDay": {
-  "date": "2026-10-27",
+  "date": "2026-10-28",
   "hours": 24,
   "lowestInertia": {
-   "hour": "2026-10-27T01:00:00+00:00",
-   "value": 4.57
+   "hour": "2026-10-28T00:00:00+00:00",
+   "value": 5.83
   },
   "highestRenewablesDK1": {
-   "hour": "2026-10-27T02:00:00+00:00",
-   "value": 1.413
+   "hour": "2026-10-28T11:00:00+00:00",
+   "value": 1.073
   },
   "widestImbalanceGap": {
-   "hour": "2026-10-27T23:00:00+00:00",
-   "value": 192.7
+   "hour": "2026-10-28T07:00:00+00:00",
+   "value": 585.8
   },
-  "aarhusRenewableMedian": 0.146,
+  "aarhusRenewableMedian": 0.155,
   "clusterHours": {
-   "1": 1,
-   "2": 23
+   "0": 13,
+   "2": 11
   }
  }
 }
